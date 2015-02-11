@@ -1,0 +1,284 @@
+<html>
+<head>
+    <title>IgSimulator 1.0 Manual</title>
+    <style type="text/css">
+        .code {
+            background-color: lightgray;
+        }
+    </style>
+    <link rel="shortcut icon" href="ig_tools.ico">
+</head>
+
+  <style>
+
+  </style>
+
+<body>
+<h1>IgSimulator 1.0 manual</h1>
+
+1. <a href = "#intro">What are IgSimulator?</a></br>
+
+2. <a href = "#install">Installation</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;2.1. <a href = "#test_datasets">Verifying your installation</a></br>
+
+3. <a href = "#simulator">IgSimulator</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;3.1. <a href = "#simulator_basic">Basic options</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;3.2. <a href = "#simulator_genes">Ig genes options</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;3.3. <a href = "#simulator_advanced">Advanced options</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;3.4. <a href = "#simulator_examples">Examples</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;3.5. <a href = "#simulator_output">Output files</a></br>
+
+4.  <a href = "#repertoire_files">Antibody repertoire representation<a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;4.1. <a href = "#clusters_fasta">CLUSTERS.FASTA file format</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;4.2. <a href = "#read_cluster_map">RCM file format</a></br>
+
+5. <a href = "#feedback">Feedback and bug reports</a></br>
+
+<!- ----------------- ->
+
+<a id = "intro"></a>
+<h2>1. What is IgSimulator?</h2>
+<code>IgSimulator</code> is a tool for simulation of antibody repertoire and Ig-Seq library.
+<code>IgSimulator</code> is designed for testing and benchmarking tools for reconstruction of Ig repertoires. 
+</br>
+
+<!- ---------------------------------------------------------------- ->
+
+<a id = "install"></a>
+<h2>2. Installation</h2>
+
+IgSimulator requires the following pre-installed dependencies:
+<ul>
+	<li>64-bit Linux system</li>
+    <li>g++ (version 4.7 or higher)</li>
+	<li>Python (version 2.7 or higher)</li>
+	<li>Additional Python modules</li>
+    <ul>
+        <li>BioPython (<a href = "http://biopython.org/wiki/Download">download link</a>)</li>
+        <li>NumPy and SciPy (including PyLab) (<a href = "http://www.scipy.org/scipylib/download.html">download link</a>)</li>
+        <li>Matplotlib (<a href = "http://matplotlib.org/downloads.html">download link</a>)</li>
+    </ul>
+</ul>
+
+To install <code>IgSimulator</code>, type:
+<pre class = "code">
+    <code>
+    make
+    </code>
+</pre> 
+
+<a id = "test_datasets"></a>
+<h3>2.1. Verifying your installation</h3>
+For testing purposes, IgSimulator comes with a toy data set. </br></br>
+
+&#9658; To try <code>IgSimulator</code> on test data set, run:
+<pre class="code">
+<code>
+    ./ig_simulator.py --test
+</code>
+</pre>
+
+If the installation is successful, you will find the following information at the end of the log:
+
+<pre class="code">
+    <code>
+    ======== IgSimulator ends
+
+    Main output files:
+    * Sequences of simulated repertoire were written to &lt;igtools_installation_directory>/ig_simulator_test/repertoire.fasta
+    * Simulated merged reads were written to &lt;igtools_installation_directory>/ig_simulator_test/merged_reads.fastq
+    * CLUSTERS.FA for simulated repertoire were written to &lt;igtools_installation_directory>/ig_simulator_test/ideal_repertoire.clusters.fa
+    * RCM for simulated repertoire were written to &lt;igtools_installation_directory>/ig_simulator_test/ideal_repertoire.rcm
+
+    Thank you for using IgSimulator!
+
+    Log was written to &lt;igtools_installation_directory>/ig_simulator_test/ig_repertoire_simulation.log
+
+    </code>
+</pre>
+
+<a id = "simulator"></a>
+<h2>3. IgSimulator</h2>
+<code>IgSimulator</code> tool takes parameters of the simulation as an input and constructs reference heavy chain repertoire, corresponding Illumina library and ideal repertoire.</br></br>
+
+Command line:
+<pre class="code">
+<code>
+    ./ig_simulator.py [options] --num-bases N1 --num-mutated N2 --repertoire-size N3 -o &lt;output_dir>
+</code>
+</pre>
+
+<!- --------------------- ->
+
+<a id = "simulator_basic"></a>
+<h3>3.1. Basic options:</h3>
+<code>-o &lt;output_dir></code></br>
+output directory (required). </br></br>
+
+<code>--num-bases &lt;int></code></br>
+number of base sequences (required).</br></br>
+
+<code>--num-mutated &lt;int></code></br>
+expected number of mutated sequences (required).</br></br>
+
+<code>--repertoire-size &lt;int></code></br>
+expected reference repertoire size (required).</br></br>
+
+<code>--HC-LC &lt;int-int></code></br>
+percentage of heavy and light chain reads in final repertoire. Default value is '100-0' (Option is in developing).</br></br>
+
+<!--
+<code>--chain-type &lt;heavy/light></code></br>
+type of simulated chains (required).</br></br>
+-->
+
+<code>--test</code></br>
+runs toy test data set (see Section <a href = "#test_datasets">3.4</a>). Command line corresponding to the test run is equivalent to the following line:
+<pre class = "code">
+    <code>
+    ./ig_simulator.py --num-bases 10 --num-mutated 50 --repertoire-size 1000 -o ig_repertoire_simulator_test 
+    </code>
+</pre>
+
+<!- --------------------- ->
+
+<a id = "simulator_genes"></a>
+<h3>3.2. Ig genes options:</h3>
+<code>--HV &lt;filename></code></br>
+FASTA file with Ig germline HV genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGHV.fa</code>.</br></br>
+
+<code>--HD &lt;filename></code></br>
+FASTA file with Ig germline HD genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGHD.fa</code>.</br></br>
+
+<code>--HJ &lt;filename></code></br>
+FASTA file with Ig germline HJ genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGHJ.fa</code>.</br></br>
+
+<code>--KV &lt;filename></code></br>
+FASTA file with Ig germline KV genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGKV.fa</code>.</br></br>
+
+<code>--KJ &lt;filename></code></br>
+FASTA file with Ig germline KJ genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGKJ.fa</code>.</br></br>
+
+<code>--LV &lt;filename></code></br>
+FASTA file with Ig germline LV genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGLV.fa</code>.</br></br>
+
+<code>--LJ &lt;filename></code></br>
+FASTA file with Ig germline LJ genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGLJ.fa</code>.</br></br>
+
+<!- ---------------------- ->
+
+<a id = "simulator_advanced"></a>
+<h3>3.3. Advanced options:</h3>
+
+<code>--skip-drawing</code></br>
+skips visualization of statistics for merged reads. Default value is <code>false</code>.</br>
+</br> 
+
+<code>--help</code></br>
+prints help.</br>
+
+<!- --------------------- ->
+
+<a id = "simulator_examples"></a>
+<h3>3.4. Examples</h3>
+To simulate heavy chain data set with 100 base sequences, ~500 mutated sequences and ~1500 sequences in the final repertoire size and, correspondingly, simulated Illumina library, run the following command: 
+<pre class = "code">
+    <code>
+    ./ig_simulator.py --num-bases 100 --num-mutated 500 --repertoire-size 1500 -o ig_simulator_test 
+    </code>
+</pre>
+
+If you want to additionally specify paths to V/D/J germline genes instead of using default IMGT database:
+<pre class = "code">
+    <code>
+    ./ig_simulator.py --num-bases 100 --num-mutated 500 --repertoire-size 1500 \\
+        --VH &lt;path_to_your_vgenes.fasta> --VD &lt;path_to_your_dgenes.fasta> --JH &lt;path_to_your_jgenes.fasta> -o ig_simulator_test 
+    </code>
+</pre>
+
+<!- --------------------- ->
+
+<a id = "simulator_output"></a>
+<h3>3.5. Output files</h3>
+<code>IgSimulator</code> tool creates working directory (which name was specified using option <code>-o</code>) and writes there the following files:
+<ul>
+    <li>Files with sequences</li>
+    <ul>
+        <li><b>repertoire.fasta</b> - FASTA file with simulated antibody repertoire that will be used as reference for Illumina library simulation.</li>
+        <li><b>left_reads.fastq</b> - FASTQ file with left reads constructed using Grinder read simulator. Reads correspond to simulated Illumina MiSeq library.</li>  
+        <li><b>right_reads.fastq</b> - FASTQ file with right reads constructed using Grinder read simulator. Reads correspond to simulated Illumina MiSeq library.</li>  
+        <li><b>merged_reads.fastq</b> - FASTQ file consructed as result of merging left and right files with reads. This file is expected to be input for <code>IgRepertoireConstruction</code> tool.</li>  
+    </ul></br>
+
+    <li>Files with statistics of the simulated repertoire:</li>
+    <ul>
+        <li><b>base_repertoire.stats</b> contains information about repertoire of base sequences of simulated repertoire. Each line of this file corresponds to one base sequence and contains the following fields: 'nucleotide sequence', 'sequence length', and 'sequence frequency in base repetoire'. Fields are separated by 'tab'.</li>
+        <li><b>mutation_positions.stats</b> contains information about all introduced somatic hypermutations. Each line corresponds to one mutation and of this file includes two field (separated by 'tab'): 'mutation position' and 'sequence length'.</li>
+        <li><b>final_repertoire.stats</b> contains information about final repertoire. Each line corresponds to sequence of Ig variable region and include the following fields (separated by 'tab'): 'nucleotide sequence' and 'frequency'.</li>
+    </ul></br>
+    
+    <li>Visialization of the statistics for the simulated repertoire</li>
+    <ul> 
+        <li><b>base_repertoire_lens.png</b> - PNG file with histogram of base sequences lengths distribution. If number of base sequences (controlled by option <code>--num-bases</code>) is enough large, distribution is expected to be normal. This file is created based on statistics from <b>base_repertoire.stats</b>.</li>
+        <li><b>base_repertoire_freqs.png</b> - PNG file with histogram of base sequences frequencies distribuition (expected to be exponential). This file is created based on statistics from <b>base_repertoire.stats</b>.</li>
+        <li><b>mutated_repertoire_freqs.png</b> - PNG file with histogram of distribuition of sequences in final repertoire (expected to be exponential). This file is created based on statistics from <b>final_repertoire.stats</b>.</li>
+        <li><b>mutation_positions.png</b> - PNG file with histogram of distribution of somatic hypermutations relative positions. This file is created based on statistics from <b>mutation_positions.stats</b>.</li>
+    </ul></br>
+
+    <li>Files described ideal repertoire (see details in section <a href = "#repertoire_files">4</a>):</li>
+    <ul>
+        <li><b>ideal_repertoire.clusters.fasta</b> - CLUSTERS.FASTA file corresponding ideal clusters for <b>merged_reads.fastq</b>.</li>
+        <li><b>ideal_repertoire.rcm</b> - RCM file corresponding ideal clusters for <b>merged_reads.fastq</b>. This file can be used as ideal read-cluster map in <code>IgQUAST</code> tool.</li>
+    </ul></br>
+
+    <li><b>ig_simulator.log</b> - full log of <code>IgSimulator</code> run.</li>
+</ul> 
+</br>
+<!- ---------------------------------------------------------------- ->
+
+<a id = "repertoire_files"></a>
+<h2>4. Antibody repertoire representation</h2>
+We used two formats of files for representation of repertoire for the set of reads: CLUSTERS.FASTA and RCM.
+
+<a id = "clusters_fasta"></a>
+<h3>4.1. CLUSTERS.FASTA file format</h3>
+CLUSTERS.FASTA is a FASTA file, where each sequence corresponds to the monoclonal antibody and header of sequence contains information about corresponding cluster (set of input reads related to the same monoclonal antibody) id and size:
+<pre class = "code">
+    <code>
+    >cluster___1___size___3
+    CCCCTGCAATTAAAATTGTTGACCACCTACATACCAAAGACGAGCGCCTTTACGCTTGCCTTTAGTACCTCGCAACGGCTGCGGACG
+    >cluster___2___size___2
+    CCCCTGCAATTAAAATTGTTGACCACCTACATACCAAAGACGAGCGCCTTTACGCTTGCCTTTAGTACCTCGCAACGGCTGCGG
+    >cluster___3___size___1
+    CCCCTGCAATTAAAATTGTTGACCACCTACATACCAAAGACGAGCGCCTTTACGCTTGCCTTTAGTACCTCGCAACGGCTGCGGAC
+    </code>
+</pre>
+
+<a id = "read_cluster_map"></a>
+<h3>4.2. RCM file format</h3>
+Every line of RCM (read-cluster map) file contains information about read name and corresponding cluster id:
+<pre class = "code">
+    <code>
+    MISEQ@:53:000000000-A2BMW:1:2114:14345:28882    1
+    MISEQ@:53:000000000-A2BMW:1:2114:14374:28884    1
+    MISEQ@:53:000000000-A2BMW:1:2114:14393:28886    1
+    MISEQ@:53:000000000-A2BMW:1:2114:16454:28882    2
+    MISEQ@:53:000000000-A2BMW:1:2114:16426:28886    2
+    MISEQ@:53:000000000-A2BMW:1:2114:15812:28886    3
+    </code>
+</pre>
+
+</br>  
+<b>NOTE:</b> ids in CLUSTERS.FASTA and RCM files should be consistent.</br></br> 
+
+<!- -------------------------------------------------------------------- ->
+<a id = "feedback"></a>
+<h2>5. Feedback and bug reports</h2>
+Your comments, bug reports, and suggestions are very welcomed.
+They will help us to further improve IgSimulator.
+<br><br>
+If you have any troubles running IgSimulator, please send us log file from output output directory.
+<br><br>
+Address for communications: <a href="mailto:safonova.yana@gmail.com">safonova.yana@gmail.com</a> (Yana Safonova). 
+
+</body>
