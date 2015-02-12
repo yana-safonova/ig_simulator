@@ -6,3 +6,9 @@
 #include <map>
 #include "stdlib.h"
 #include "stdio.h"
+#include <memory>
+#include "../utils/sequence_tools.hpp"
+
+size_t RandomInt(size_t max) {
+    return rand() % max;
+}
