@@ -12,3 +12,7 @@
 size_t RandomInt(size_t max) {
     return rand() % max;
 }
+
+size_t RandomIndex(size_t to, size_t from = 0) {
+    return rand() % (to - from) + from;
+}

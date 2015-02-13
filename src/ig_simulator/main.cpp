@@ -3,12 +3,17 @@
 #include "exonuclease_remover.hpp"
 #include "p_nucleotides_creator.hpp"
 #include "n_nucleotides_creator.hpp"
+#include "repertoire.hpp"
+#include "multiplicity_creator.hpp"
 
 int main(int argc, char *argv[]) {
     // test input data
     string vgenes_filename = string(argv[1]);
     string dgenes_filename = string(argv[2]);
     string jgenes_filename = string(argv[3]);
+
+    size_t base_repertoire_size = 10;
+    size_t mutated_repertoire_size = 100;
 
     // HC DB
     HC_GenesDatabase hc_database;
@@ -32,14 +37,28 @@ int main(int argc, char *argv[]) {
     HC_SimpleNInsertionStrategy n_nucls_strategy;
     HC_SimpleNNucleotidesCreator n_creator(n_nucls_strategy);
 
-    for(size_t i = 0; i < 10; i++) {
+    // repertoire
+    HC_Repertoire base_repertoire;
+
+    // base multiplicity creator
+    double base_lambda = double(base_repertoire_size) / mutated_repertoire_size;
+    HC_ExponentialMultiplicityCreator base_multiplicity_creator(base_lambda);
+
+    for(size_t i = 0; i < base_repertoire_size; i++) {
         auto vdj = hc_vdj_recombinator.CreateRecombination();
         vdj = remover.CreateRemovingSettings(vdj);
         vdj = p_creator.CreatePNucleotides(vdj);
         vdj = n_creator.CreateNNucleotides(vdj);
-        vdj->Print(cout);
+        cout << (*vdj);
         cout << "-----------------" << endl;
+
+        HC_VariableRegionPtr ig_variable_region = HC_VariableRegionPtr(new HC_VariableRegion(vdj));
+        size_t multiplicity = base_multiplicity_creator.AssignMultiplicity(ig_variable_region);
+        base_repertoire.Add(HC_Cluster(ig_variable_region, multiplicity));
     }
+
+    for(auto it = base_repertoire.begin(); it != base_repertoire.end(); it++)
+        cout << it->IgVariableRegion()->VDJ_Recombination()->Sequence() << " " << it->Multiplicity() << endl;
 
     return 0;
 }

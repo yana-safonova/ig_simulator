@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ig_structure_structs.hpp"
+#include "ig_structs/ig_structure_structs.hpp"
 
 template<class GeneDB, class VDJ_Recombination_Ptr, class RecombinationCreator>
 class VDJ_Recombinator {
@@ -19,17 +19,18 @@ public:
 };
 
 // ----------------------------------------------------------------------------
-size_t RandomIndex(size_t to, size_t from = 0) {
-    return rand() % to + from;
-}
+//      Simple creator of VDJ recombination
+//      - randomly chooses V, D, J genes from database
+//      - probabilities from all V, D, and J are equal
+// ----------------------------------------------------------------------------
 
+// HC
 class HC_SimpleRecombinationCreator {
     const HC_GenesDatabase &db_;
-    size_t seed_;
 
 public:
-    HC_SimpleRecombinationCreator(const HC_GenesDatabase &db, size_t seed = 1) :
-            db_(db), seed_(seed) { }
+    HC_SimpleRecombinationCreator(const HC_GenesDatabase &db) :
+            db_(db) { }
 
     HC_VDJ_Recombination_Ptr CreateRecombination() {
         return HC_VDJ_Recombination_Ptr(
@@ -40,13 +41,14 @@ public:
     }
 };
 
+// LC
 class LC_SimpleRecombinationCreator {
     const LC_GenesDatabase &db_;
     size_t seed_;
 
 public:
-    LC_SimpleRecombinationCreator(const LC_GenesDatabase &db, size_t seed = 1) :
-            db_(db), seed_(seed) { }
+    LC_SimpleRecombinationCreator(const LC_GenesDatabase &db) :
+            db_(db) { }
 
     LC_VDJ_Recombination CreateRecombination() {
         return LC_VDJ_Recombination(db_,
@@ -59,4 +61,5 @@ public:
 
 typedef VDJ_Recombinator<HC_GenesDatabase, HC_VDJ_Recombination_Ptr, HC_SimpleRecombinationCreator>
         HC_SimpleRecombinator;
-typedef VDJ_Recombinator<LC_GenesDatabase, LC_VDJ_Recombination_Ptr, LC_SimpleRecombinationCreator> LC_SimpleRecombinator;
+typedef VDJ_Recombinator<LC_GenesDatabase, LC_VDJ_Recombination_Ptr, LC_SimpleRecombinationCreator>
+        LC_SimpleRecombinator;
