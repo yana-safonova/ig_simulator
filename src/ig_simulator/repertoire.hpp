@@ -5,6 +5,7 @@
 template<class VDJ_Recombination_Ptr>
 class IgVariableRegion {
     VDJ_Recombination_Ptr vdj_recombination_;
+    SHMSettings shm_settings_;
 
 public:
     IgVariableRegion(VDJ_Recombination_Ptr vdj_recombination) :
@@ -12,6 +13,17 @@ public:
 
     VDJ_Recombination_Ptr VDJ_Recombination() {
         return vdj_recombination_;
+    }
+
+    void AddSHMSettings(SHMSettings shm_settings) {
+        shm_settings_ = shm_settings;
+    }
+
+    const SHMSettings& GetSHMSettings() const { return shm_settings_; };
+
+    IgVariableRegion<VDJ_Recombination_Ptr> Clone() {
+        // todo: implement me
+        return *this;
     }
 };
 
@@ -56,8 +68,9 @@ class Repertoire {
 public:
     Repertoire() { }
 
-    void Add(IgCluster ig_cluster) {
-        ig_clusters_.push_back(ig_cluster);
+    void Add(IgCluster ig_cluster, size_t cluster_multiplicity = 1) {
+        for(size_t i = 0; i < cluster_multiplicity; i++)
+            ig_clusters_.push_back(ig_cluster);
     }
 
     size_t Size() const {

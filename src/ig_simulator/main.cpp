@@ -5,6 +5,7 @@
 #include "n_nucleotides_creator.hpp"
 #include "repertoire.hpp"
 #include "multiplicity_creator.hpp"
+#include "shm_creator.hpp"
 
 int main(int argc, char *argv[]) {
     // test input data
@@ -14,6 +15,7 @@ int main(int argc, char *argv[]) {
 
     size_t base_repertoire_size = 10;
     size_t mutated_repertoire_size = 100;
+    size_t final_repertoire_size = 750;
 
     // HC DB
     HC_GenesDatabase hc_database;
@@ -57,8 +59,33 @@ int main(int argc, char *argv[]) {
         base_repertoire.Add(HC_Cluster(ig_variable_region, multiplicity));
     }
 
+    mutated_repertoire_size = 0;
+    for(auto it = base_repertoire.begin(); it != base_repertoire.end(); it++)
+        mutated_repertoire_size += it->Multiplicity();
+
+    cout << "Base repertoire:" << endl;
     for(auto it = base_repertoire.begin(); it != base_repertoire.end(); it++)
         cout << it->IgVariableRegion()->VDJ_Recombination()->Sequence() << " " << it->Multiplicity() << endl;
+
+    // mutated repertoire
+    HC_Repertoire mutated_repertoire;
+
+    // mutated multiplicity creator
+    double mutated_lambda = double(mutated_repertoire_size) / double(final_repertoire_size);
+    HC_ExponentialMultiplicityCreator mutated_multiplicity_creator(mutated_lambda);
+
+    HC_SHMCreationStrategy shm_creation_strategy;
+    HC_SHMCreator shm_creator(shm_creation_strategy);
+
+    for(auto it = base_repertoire.begin(); it != base_repertoire.end(); it++)
+        for(size_t i = 0; i < it->Multiplicity(); i++) {
+            auto variable_region = it->IgVariableRegion()->Clone();
+            HC_VariableRegionPtr variable_region_ptr(&variable_region);
+
+            variable_region_ptr = shm_creator.CreateSHM(variable_region_ptr);
+            size_t multiplicity = mutated_multiplicity_creator.AssignMultiplicity(variable_region_ptr);
+            mutated_repertoire.Add(HC_Cluster(variable_region_ptr, multiplicity));
+        }
 
     return 0;
 }

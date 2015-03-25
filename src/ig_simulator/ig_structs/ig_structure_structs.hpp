@@ -5,6 +5,7 @@
 #include "removing_settings.hpp"
 #include "p_insertion_settings.hpp"
 #include "n_insertion_settings.hpp"
+#include "shm_settings.hpp"
 
 // ----------------------------------------------------------------------------
 
@@ -156,6 +157,10 @@ class LC_VDJ_Recombination {
 
     // n-nucleotides insertion
     LC_NInsertionSettings n_insertion_settings_;
+
+    // sequence fields
+    bool update_sequence_;
+    string sequence_;
 
 public:
     LC_VDJ_Recombination(const LC_GenesDatabase &db,
