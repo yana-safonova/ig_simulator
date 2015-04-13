@@ -50,10 +50,11 @@ public:
     LC_SimpleRecombinationCreator(const LC_GenesDatabase_Ptr db_ptr) :
             db_ptr_(db_ptr) { }
 
-    LC_VDJ_Recombination CreateRecombination() {
-        return LC_VDJ_Recombination(db_ptr_,
+    LC_VDJ_Recombination_Ptr CreateRecombination() {
+        return LC_VDJ_Recombination_Ptr(
+                new LC_VDJ_Recombination(db_ptr_,
                 RandomIndex(db_ptr_->GenesNumber(variable_gene)),
-                RandomIndex(db_ptr_->GenesNumber(join_gene)));
+                RandomIndex(db_ptr_->GenesNumber(join_gene))));
     }
 };
 

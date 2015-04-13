@@ -172,6 +172,12 @@ class LC_VDJ_Recombination {
     bool update_sequence_;
     string sequence_;
 
+    string ComputeSequence() const {
+        return VgeneSeq().substr(0, VgeneLen()) +
+               p_insertion_settings_.VEnd() + n_insertion_settings_.VJ_Insertion() + p_insertion_settings_.JStart() +
+               JgeneSeq().substr(removing_settings_.JStartLen(), JgeneLen());
+    }
+
 public:
     LC_VDJ_Recombination(const LC_GenesDatabase_Ptr db_ptr,
             size_t vgene_index,
@@ -180,38 +186,79 @@ public:
             vgene_index_(vgene_index),
             jgene_index_(jgene_index) { }
 
+    // v block
     size_t VgeneIndex() const { return vgene_index_; }
 
-    size_t JgeneIndex() const { return jgene_index_; }
+    string VgeneSeq() const {
+        return db_ptr_->GetByIndex(variable_gene, vgene_index_).GeneSeq();
+    }
 
     string VgeneName() const {
         return db_ptr_->GetByIndex(variable_gene, vgene_index_).GeneName();
+    }
+
+    size_t VgeneLen() const {
+        return VgeneSeq().size() - removing_settings_.VEndLen();
+    }
+
+    // j block
+    size_t JgeneIndex() const { return jgene_index_; }
+
+    string JgeneSeq() const {
+        return db_ptr_->GetByIndex(join_gene, jgene_index_).GeneSeq();
     }
 
     string JgeneName() const {
         return db_ptr_->GetByIndex(join_gene, jgene_index_).GeneName();
     }
 
+    size_t JgeneLen() const {
+        return JgeneSeq().size() - removing_settings_.JStartLen();
+    }
+
+    // removing settings
     void AddRemovingSettings(LC_RemovingSettings removing_settings) {
         removing_settings_ = removing_settings;
     }
 
     const LC_RemovingSettings RemovingSettings() const { return removing_settings_; }
 
+    // p insertion settings
     void AddPInsertionSettings(LC_PInsertionSettings p_insertion_settings) {
         p_insertion_settings_ = p_insertion_settings;
     }
 
     const LC_PInsertionSettings PInsertionSettings() const { return p_insertion_settings_; }
 
+    // n insertion settings
     void AddNInsertionSettings(LC_NInsertionSettings n_insertion_settings) {
         n_insertion_settings_ = n_insertion_settings;
     }
 
     const LC_NInsertionSettings NInsertionSettings() const { return n_insertion_settings_; }
 
+    // db
     const LC_GenesDatabase_Ptr GeneDB() const { return db_ptr_; }
+
+    string Sequence() {
+        if(update_sequence_)
+            sequence_ = ComputeSequence();
+        update_sequence_ = false;
+        return sequence_;
+    }
+
+    typedef shared_ptr<LC_VDJ_Recombination> LC_VDJ_Recombination_Ptr;
+
+    LC_VDJ_Recombination_Ptr Clone() {
+        LC_VDJ_Recombination_Ptr vdj(new LC_VDJ_Recombination(db_ptr_, VgeneIndex(), JgeneIndex()));
+        vdj->AddRemovingSettings(RemovingSettings());
+        vdj->AddNInsertionSettings(NInsertionSettings());
+        vdj->AddPInsertionSettings(PInsertionSettings());
+        return vdj;
+    }
 };
+
+typedef LC_VDJ_Recombination::LC_VDJ_Recombination_Ptr LC_VDJ_Recombination_Ptr;
 
 ostream& operator<<(ostream &out, const LC_VDJ_Recombination &obj) {
     out << "Indices: " << obj.VgeneIndex() << " " << obj.JgeneIndex() << endl;

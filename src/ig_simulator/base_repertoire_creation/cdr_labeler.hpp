@@ -73,4 +73,4 @@ typedef LC_SimpleCDRLabelingStrategy<LC_VariableRegionPtr, CDRSettings> LC_CDRLa
 
 // ----------------------------------------------------------
 typedef CDRLabeler<HC_VariableRegionPtr, HC_CDRLabelingStrategy, CDRSettings> HC_CDRLabeler;
-typedef CDRLabeler<LC_VariableRegionPtr, HC_CDRLabelingStrategy, CDRSettings> LC_CDRLabeler;
+typedef CDRLabeler<LC_VariableRegionPtr, LC_CDRLabelingStrategy, CDRSettings> LC_CDRLabeler;
