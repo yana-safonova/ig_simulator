@@ -54,6 +54,8 @@ int main(int argc, char *argv[]) {
         cout << (*vdj);
         cout << "-----------------" << endl;
 
+        // todo: insert here CDR labeling
+
         HC_VariableRegionPtr ig_variable_region = HC_VariableRegionPtr(new HC_VariableRegion(vdj));
         size_t multiplicity = base_multiplicity_creator.AssignMultiplicity(ig_variable_region);
         base_repertoire.Add(HC_Cluster(ig_variable_region, multiplicity));
@@ -74,18 +76,25 @@ int main(int argc, char *argv[]) {
     double mutated_lambda = double(mutated_repertoire_size) / double(final_repertoire_size);
     HC_ExponentialMultiplicityCreator mutated_multiplicity_creator(mutated_lambda);
 
-    HC_SHMCreationStrategy shm_creation_strategy;
+    size_t min_number_mutations = 2;
+    size_t max_number_mutations = 10;
+    HC_RgywWrcySHMStrategy shm_creation_strategy(min_number_mutations, max_number_mutations);
     HC_SHMCreator shm_creator(shm_creation_strategy);
 
-    for(auto it = base_repertoire.begin(); it != base_repertoire.end(); it++)
+    for(auto it = base_repertoire.begin(); it != base_repertoire.end(); it++) {
+        cout << "New base antibody, multiplicity: " << it->Multiplicity() << endl;
         for(size_t i = 0; i < it->Multiplicity(); i++) {
-            auto variable_region = it->IgVariableRegion()->Clone();
-            HC_VariableRegionPtr variable_region_ptr(&variable_region);
+            auto variable_region_ptr = it->IgVariableRegion()->Clone();
 
             variable_region_ptr = shm_creator.CreateSHM(variable_region_ptr);
             size_t multiplicity = mutated_multiplicity_creator.AssignMultiplicity(variable_region_ptr);
             mutated_repertoire.Add(HC_Cluster(variable_region_ptr, multiplicity));
+            cout << "----" << endl;
         }
+        cout << "-----------------------------" << endl;
+        return 0;
+    }
+
 
     return 0;
 }

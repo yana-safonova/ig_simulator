@@ -1,29 +1,61 @@
 #pragma once
 
 #include "ig_structs/ig_structure_structs.hpp"
+#include "ig_structs/shm_settings.hpp"
+#include "ig_structs/cdr_settings.hpp"
 
 template<class VDJ_Recombination_Ptr>
 class IgVariableRegion {
     VDJ_Recombination_Ptr vdj_recombination_;
     SHMSettings shm_settings_;
+    CDRSettings cdr_settings_;
+
+    string sequence_;
+    bool update_seq_;
+
+    void ComputeSequence() {
+        // do something
+        update_seq_ = false;
+    }
 
 public:
     IgVariableRegion(VDJ_Recombination_Ptr vdj_recombination) :
-            vdj_recombination_(vdj_recombination) { }
+            vdj_recombination_(vdj_recombination),
+            sequence_(vdj_recombination->Sequence()),
+            update_seq_(false) {
+    }
 
     VDJ_Recombination_Ptr VDJ_Recombination() {
         return vdj_recombination_;
     }
 
-    void AddSHMSettings(SHMSettings shm_settings) {
+    void SetSHMSettings(SHMSettings shm_settings) {
         shm_settings_ = shm_settings;
+        update_seq_ = true;
     }
 
     const SHMSettings& GetSHMSettings() const { return shm_settings_; };
 
-    IgVariableRegion<VDJ_Recombination_Ptr> Clone() {
-        // todo: implement me
-        return *this;
+    void SetCDRSettings(CDRSettings cdr_settings) {
+        cdr_settings_ = cdr_settings;
+    }
+
+    const CDRSettings& GetCDRSettings() const { return cdr_settings_; }
+
+    string Sequence() {
+        if(update_seq_)
+            ComputeSequence();
+        return sequence_;
+    }
+
+    typedef shared_ptr<IgVariableRegion<VDJ_Recombination_Ptr> > IgVariableRegionPtr;
+
+    IgVariableRegionPtr Clone() {
+        IgVariableRegionPtr variable_region_ptr(
+                new IgVariableRegion<VDJ_Recombination_Ptr>(vdj_recombination_->Clone()));
+        variable_region_ptr->SetSHMSettings(shm_settings_);
+        variable_region_ptr->SetCDRSettings(cdr_settings_);
+        return variable_region_ptr;
     }
 };
 

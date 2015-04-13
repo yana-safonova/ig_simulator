@@ -2,6 +2,7 @@
 
 #include "ig_structs/ig_structure_structs.hpp"
 #include "repertoire.hpp"
+#include "shm_strategies/rgyw_wrcy_strategy.hpp"
 
 template<class IgVariableRegionPtr, class SHMCreationStrategy, class SHMCreationSettings>
 class SHMCreator {
@@ -12,29 +13,19 @@ public:
 
     IgVariableRegionPtr CreateSHM(IgVariableRegionPtr ig_variable_region_ptr) {
         SHMCreationSettings settings =  strategy_.CreateSHM(ig_variable_region_ptr);
-        ig_variable_region_ptr->AddSHMSettings(settings);
+        cout << "Creation SHM settings" << endl;
+        cout << settings;
+        ig_variable_region_ptr->SetSHMSettings(settings);
         return ig_variable_region_ptr;
     }
 };
 
 // ----------------------------------------------------------
-// Simple SHM strategy
-
-template<class IgVariableRegionPtr, class SHMSettings>
-class SHMCreationStrategy {
-public:
-    SHMSettings CreateSHM(IgVariableRegionPtr ig_variable_region_ptr) {
-        SHMSettings settings;
-        SHM mutation(0, SubstitutionSHM);
-        settings.Add(mutation);
-        return settings;
-    }
-};
-
-typedef SHMCreationStrategy<HC_VariableRegionPtr, SHMSettings> HC_SHMCreationStrategy;
-typedef SHMCreationStrategy<LC_VariableRegionPtr, SHMSettings> LC_SHMCreationStrategy;
-
+// composite strategy
+// todo
 // ---------------------------------------------------------
 
-typedef SHMCreator<HC_VariableRegionPtr, HC_SHMCreationStrategy, SHMSettings> HC_SHMCreator;
-typedef SHMCreator<LC_VariableRegionPtr, LC_SHMCreationStrategy, SHMSettings> LC_SHMCreator;
+
+
+typedef SHMCreator<HC_VariableRegionPtr, HC_RgywWrcySHMStrategy, SHMSettings> HC_SHMCreator;
+typedef SHMCreator<LC_VariableRegionPtr, LC_RgywWrcySHMStrategy, SHMSettings> LC_SHMCreator;

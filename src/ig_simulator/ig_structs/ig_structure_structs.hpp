@@ -123,6 +123,16 @@ public:
         update_sequence_ = false;
         return sequence_;
     }
+
+    typedef shared_ptr<HC_VDJ_Recombination> HC_VDJ_Recombination_Ptr;
+
+    HC_VDJ_Recombination_Ptr Clone() {
+        HC_VDJ_Recombination_Ptr vdj(new HC_VDJ_Recombination(db_, VgeneIndex(), DgeneIndex(), JgeneIndex()));
+        vdj->AddRemovingSettings(RemovingSettings());
+        vdj->AddNInsertionSettings(NInsertionSettings());
+        vdj->AddPInsertionSettings(PInsertionSettings());
+        return vdj;
+    }
 };
 
 ostream& operator<<(ostream &out, HC_VDJ_Recombination &obj) {
@@ -140,7 +150,7 @@ ostream& operator<<(ostream &out, HC_VDJ_Recombination &obj) {
     return out;
 }
 
-typedef shared_ptr<HC_VDJ_Recombination> HC_VDJ_Recombination_Ptr;
+typedef HC_VDJ_Recombination::HC_VDJ_Recombination_Ptr HC_VDJ_Recombination_Ptr;
 
 // ----------------------------------------------------------------------------
 
