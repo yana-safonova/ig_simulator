@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 
 class HC_VDJ_Recombination {
-    const HC_GenesDatabase &db_;
+    const HC_GenesDatabase_Ptr db_ptr_;
     size_t vgene_index_;
     size_t dgene_index_;
     size_t jgene_index_;
@@ -37,11 +37,11 @@ class HC_VDJ_Recombination {
     }
 
 public:
-    HC_VDJ_Recombination(const HC_GenesDatabase &db,
+    HC_VDJ_Recombination(const HC_GenesDatabase_Ptr db_ptr,
             size_t vgene_index,
             size_t dgene_index,
             size_t jgene_index) :
-            db_(db),
+            db_ptr_(db_ptr),
             vgene_index_(vgene_index),
             dgene_index_(dgene_index),
             jgene_index_(jgene_index),
@@ -56,11 +56,11 @@ public:
 
     // V gene block
     string VgeneName() const {
-        return db_.GetByIndex(variable_gene, vgene_index_).GeneName();
+        return db_ptr_->GetByIndex(variable_gene, vgene_index_).GeneName();
     }
 
     string VgeneSeq() const {
-        return db_.GetByIndex(variable_gene, vgene_index_).GeneSeq();
+        return db_ptr_->GetByIndex(variable_gene, vgene_index_).GeneSeq();
     }
 
     size_t VgeneLen() const {
@@ -69,11 +69,11 @@ public:
 
     // D gene block
     string DgeneName() const {
-        return db_.GetByIndex(diversity_gene, dgene_index_).GeneName();
+        return db_ptr_->GetByIndex(diversity_gene, dgene_index_).GeneName();
     }
 
     string DgeneSeq() const {
-        return db_.GetByIndex(diversity_gene, dgene_index_).GeneSeq();
+        return db_ptr_->GetByIndex(diversity_gene, dgene_index_).GeneSeq();
     }
 
     size_t DgeneLen() const {
@@ -82,11 +82,11 @@ public:
 
     // D gene block
     string JgeneName() const {
-        return db_.GetByIndex(join_gene, jgene_index_).GeneName();
+        return db_ptr_->GetByIndex(join_gene, jgene_index_).GeneName();
     }
 
     string JgeneSeq() const {
-        return db_.GetByIndex(join_gene, jgene_index_).GeneSeq();
+        return db_ptr_->GetByIndex(join_gene, jgene_index_).GeneSeq();
     }
 
     size_t JgeneLen() const {
@@ -115,7 +115,7 @@ public:
 
     const HC_NInsertionSettings NInsertionSettings() const { return n_insertion_settings_; }
 
-    const HC_GenesDatabase& GeneDB() const { return db_; }
+    const HC_GenesDatabase_Ptr GeneDB() const { return db_ptr_; }
 
     string Sequence() {
         if(update_sequence_)
@@ -127,7 +127,7 @@ public:
     typedef shared_ptr<HC_VDJ_Recombination> HC_VDJ_Recombination_Ptr;
 
     HC_VDJ_Recombination_Ptr Clone() {
-        HC_VDJ_Recombination_Ptr vdj(new HC_VDJ_Recombination(db_, VgeneIndex(), DgeneIndex(), JgeneIndex()));
+        HC_VDJ_Recombination_Ptr vdj(new HC_VDJ_Recombination(db_ptr_, VgeneIndex(), DgeneIndex(), JgeneIndex()));
         vdj->AddRemovingSettings(RemovingSettings());
         vdj->AddNInsertionSettings(NInsertionSettings());
         vdj->AddPInsertionSettings(PInsertionSettings());
@@ -155,7 +155,7 @@ typedef HC_VDJ_Recombination::HC_VDJ_Recombination_Ptr HC_VDJ_Recombination_Ptr;
 // ----------------------------------------------------------------------------
 
 class LC_VDJ_Recombination {
-    const LC_GenesDatabase &db_;
+    const LC_GenesDatabase_Ptr db_ptr_;
     size_t vgene_index_;
     size_t jgene_index_;
 
@@ -173,10 +173,10 @@ class LC_VDJ_Recombination {
     string sequence_;
 
 public:
-    LC_VDJ_Recombination(const LC_GenesDatabase &db,
+    LC_VDJ_Recombination(const LC_GenesDatabase_Ptr db_ptr,
             size_t vgene_index,
             size_t jgene_index) :
-            db_(db),
+            db_ptr_(db_ptr),
             vgene_index_(vgene_index),
             jgene_index_(jgene_index) { }
 
@@ -185,11 +185,11 @@ public:
     size_t JgeneIndex() const { return jgene_index_; }
 
     string VgeneName() const {
-        return db_.GetByIndex(variable_gene, vgene_index_).GeneName();
+        return db_ptr_->GetByIndex(variable_gene, vgene_index_).GeneName();
     }
 
     string JgeneName() const {
-        return db_.GetByIndex(join_gene, jgene_index_).GeneName();
+        return db_ptr_->GetByIndex(join_gene, jgene_index_).GeneName();
     }
 
     void AddRemovingSettings(LC_RemovingSettings removing_settings) {
@@ -210,7 +210,7 @@ public:
 
     const LC_NInsertionSettings NInsertionSettings() const { return n_insertion_settings_; }
 
-    const LC_GenesDatabase& GeneDB() const { return db_; }
+    const LC_GenesDatabase_Ptr GeneDB() const { return db_ptr_; }
 };
 
 ostream& operator<<(ostream &out, const LC_VDJ_Recombination &obj) {

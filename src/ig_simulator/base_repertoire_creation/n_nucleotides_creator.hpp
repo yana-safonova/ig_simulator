@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ig_structs/ig_structure_structs.hpp"
+#include "../ig_structs/ig_structure_structs.hpp"
 
 // ----------------------------------------------------------------------------
 //  Basic class that adds n-nucleotides in VDJ-recombination

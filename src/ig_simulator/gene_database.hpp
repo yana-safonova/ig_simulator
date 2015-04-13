@@ -118,6 +118,8 @@ public:
     }
 };
 
+typedef shared_ptr<HC_GenesDatabase> HC_GenesDatabase_Ptr;
+
 // ----------------------------------------------------------------------------
 
 class LC_GenesDatabase {
@@ -154,3 +156,6 @@ public:
         join_genes_.Print(out);
     }
 };
+
+
+typedef shared_ptr<LC_GenesDatabase> LC_GenesDatabase_Ptr;

@@ -118,7 +118,17 @@ public:
     IgClusterIterator end() const {
         return ig_clusters_.end();
     }
+
+    size_t NumberAntibodies() {
+        size_t size = 0;
+        for(auto it = begin(); it != end(); it++)
+            size += it->Multiplicity();
+        return size;
+    }
 };
 
 typedef Repertoire<HC_Cluster, HC_ClusterIterator> HC_Repertoire;
 typedef Repertoire<LC_Cluster, LC_ClusterIterator> LC_Repertoire;
+
+typedef shared_ptr<HC_Repertoire> HC_Repertoire_Ptr;
+typedef shared_ptr<LC_Repertoire> LC_Repertoire_Ptr;

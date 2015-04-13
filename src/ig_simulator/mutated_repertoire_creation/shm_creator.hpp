@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ig_structs/ig_structure_structs.hpp"
-#include "repertoire.hpp"
+#include "../ig_structs/ig_structure_structs.hpp"
+#include "../repertoire.hpp"
 #include "shm_strategies/rgyw_wrcy_strategy.hpp"
 
 template<class IgVariableRegionPtr, class SHMCreationStrategy, class SHMCreationSettings>

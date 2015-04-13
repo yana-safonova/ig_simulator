@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ig_structs/ig_structure_structs.hpp"
+#include "../ig_structs/ig_structure_structs.hpp"
 
 template<class VDJ_Recombination_Ptr, class RemovingStrategy, class RemovingSettings>
 class ExonucleaseRemover {
