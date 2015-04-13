@@ -48,6 +48,8 @@ public:
         return sequence_;
     }
 
+    size_t Length() { return Sequence().size(); }
+
     typedef shared_ptr<IgVariableRegion<VDJ_Recombination_Ptr> > IgVariableRegionPtr;
 
     IgVariableRegionPtr Clone() {

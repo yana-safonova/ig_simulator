@@ -18,6 +18,13 @@ public:
     size_t End() const { return end_; }
 };
 
+ostream& operator<<(ostream &out, const CDRLabel &label) {
+    out << label.Start() << " - " << label.End();
+    return out;
+}
+
+// ----------------------------------------------------------
+
 class CDRSettings {
     CDRLabel cdr1_;
     CDRLabel cdr2_;
@@ -38,3 +45,10 @@ public:
 
     CDRLabel CDR3() const { return cdr3_; }
 };
+
+ostream& operator<<(ostream &out, const CDRSettings &cdr_settings) {
+    out << "CDR1: " << cdr_settings.CDR1() << endl;
+    out << "CDR2: " << cdr_settings.CDR2() << endl;
+    out << "CDR3: " << cdr_settings.CDR3() << endl;
+    return out;
+}

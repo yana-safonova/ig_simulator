@@ -5,7 +5,8 @@
 #include "n_nucleotides_creator.hpp"
 #include "repertoire.hpp"
 #include "multiplicity_creator.hpp"
-#include "shm_creator.hpp"
+#include "cdr_labeler.hpp"
+//#include "shm_creator.hpp"
 
 int main(int argc, char *argv[]) {
     // test input data
@@ -46,6 +47,10 @@ int main(int argc, char *argv[]) {
     double base_lambda = double(base_repertoire_size) / mutated_repertoire_size;
     HC_ExponentialMultiplicityCreator base_multiplicity_creator(base_lambda);
 
+    // cdr labeling
+    HC_CDRLabelingStrategy cdr_labeling_strategy;
+    HC_CDRLabeler cdr_labeler(cdr_labeling_strategy);
+
     for(size_t i = 0; i < base_repertoire_size; i++) {
         auto vdj = hc_vdj_recombinator.CreateRecombination();
         vdj = remover.CreateRemovingSettings(vdj);
@@ -54,9 +59,10 @@ int main(int argc, char *argv[]) {
         cout << (*vdj);
         cout << "-----------------" << endl;
 
-        // todo: insert here CDR labeling
-
         HC_VariableRegionPtr ig_variable_region = HC_VariableRegionPtr(new HC_VariableRegion(vdj));
+
+        ig_variable_region = cdr_labeler.LabelCDRs(ig_variable_region);
+
         size_t multiplicity = base_multiplicity_creator.AssignMultiplicity(ig_variable_region);
         base_repertoire.Add(HC_Cluster(ig_variable_region, multiplicity));
     }
@@ -66,8 +72,10 @@ int main(int argc, char *argv[]) {
         mutated_repertoire_size += it->Multiplicity();
 
     cout << "Base repertoire:" << endl;
-    for(auto it = base_repertoire.begin(); it != base_repertoire.end(); it++)
+    for(auto it = base_repertoire.begin(); it != base_repertoire.end(); it++) {
         cout << it->IgVariableRegion()->VDJ_Recombination()->Sequence() << " " << it->Multiplicity() << endl;
+        cout << it->IgVariableRegion()->GetCDRSettings();
+    }
 
     // mutated repertoire
     HC_Repertoire mutated_repertoire;
@@ -76,17 +84,17 @@ int main(int argc, char *argv[]) {
     double mutated_lambda = double(mutated_repertoire_size) / double(final_repertoire_size);
     HC_ExponentialMultiplicityCreator mutated_multiplicity_creator(mutated_lambda);
 
-    size_t min_number_mutations = 2;
-    size_t max_number_mutations = 10;
-    HC_RgywWrcySHMStrategy shm_creation_strategy(min_number_mutations, max_number_mutations);
-    HC_SHMCreator shm_creator(shm_creation_strategy);
+    //size_t min_number_mutations = 2;
+    //size_t max_number_mutations = 10;
+    //HC_RgywWrcySHMStrategy shm_creation_strategy(min_number_mutations, max_number_mutations);
+    //HC_SHMCreator shm_creator(shm_creation_strategy);
 
     for(auto it = base_repertoire.begin(); it != base_repertoire.end(); it++) {
         cout << "New base antibody, multiplicity: " << it->Multiplicity() << endl;
         for(size_t i = 0; i < it->Multiplicity(); i++) {
             auto variable_region_ptr = it->IgVariableRegion()->Clone();
 
-            variable_region_ptr = shm_creator.CreateSHM(variable_region_ptr);
+            //variable_region_ptr = shm_creator.CreateSHM(variable_region_ptr);
             size_t multiplicity = mutated_multiplicity_creator.AssignMultiplicity(variable_region_ptr);
             mutated_repertoire.Add(HC_Cluster(variable_region_ptr, multiplicity));
             cout << "----" << endl;

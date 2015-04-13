@@ -26,6 +26,5 @@ public:
 // ---------------------------------------------------------
 
 
-
 typedef SHMCreator<HC_VariableRegionPtr, HC_RgywWrcySHMStrategy, SHMSettings> HC_SHMCreator;
 typedef SHMCreator<LC_VariableRegionPtr, LC_RgywWrcySHMStrategy, SHMSettings> LC_SHMCreator;
