@@ -6,16 +6,7 @@
 #include "base_repertoire_creation/cdr_labeler.hpp"
 #include "repertoire.hpp"
 #include "multiplicity_creator.hpp"
-//#include "mutated_repertoire_creation/shm_creator.hpp"
-
-struct LC_InputParams {
-    string vgenes_fname;
-    string jgenes_fname;
-
-    size_t base_repertoire_size;
-    size_t mutated_repertoire_size;
-    size_t final_repertoire_size;
-};
+#include "mutated_repertoire_creation/shm_creator.hpp"
 
 LC_GenesDatabase_Ptr CreateLCDatabase(LC_InputParams params) {
     LC_GenesDatabase_Ptr lc_database(new LC_GenesDatabase());
@@ -43,14 +34,15 @@ LC_Repertoire_Ptr CreateBaseLCRepertoire(LC_InputParams params, LC_GenesDatabase
     LC_Repertoire_Ptr base_repertoire(new LC_Repertoire());
 
     // base multiplicity creator
-    double base_lambda = double(params.base_repertoire_size) / params.mutated_repertoire_size;
+    double base_lambda = double(params.basic_repertoire_params.base_repertoire_size) /
+            params.basic_repertoire_params.mutated_repertoire_size;
     LC_ExponentialMultiplicityCreator base_multiplicity_creator(base_lambda);
 
     // cdr labeling
     LC_CDRLabelingStrategy cdr_labeling_strategy;
     LC_CDRLabeler cdr_labeler(cdr_labeling_strategy);
 
-    for(size_t i = 0; i < params.base_repertoire_size; i++) {
+    for(size_t i = 0; i < params.basic_repertoire_params.base_repertoire_size; i++) {
         auto vdj = lc_vdj_recombinator.CreateRecombination();
         vdj = remover.CreateRemovingSettings(vdj);
         vdj = p_creator.CreatePNucleotides(vdj);
@@ -71,21 +63,22 @@ LC_Repertoire_Ptr CreateMutatedLCRepertoire(LC_InputParams params, LC_Repertoire
     LC_Repertoire_Ptr mutated_repertoire(new LC_Repertoire());
 
     // mutated multiplicity creator
-    double mutated_lambda = double(base_repertoire->NumberAntibodies()) / double(params.final_repertoire_size);
+    double mutated_lambda = double(base_repertoire->NumberAntibodies()) /
+            double(params.basic_repertoire_params.final_repertoire_size);
     LC_ExponentialMultiplicityCreator mutated_multiplicity_creator(mutated_lambda);
 
-    // todo!!!
-    //size_t min_number_mutations = 2;
-    //size_t max_number_mutations = 10;
-    //HC_RgywWrcySHMStrategy shm_creation_strategy(min_number_mutations, max_number_mutations);
-    //HC_SHMCreator shm_creator(shm_creation_strategy);
+    // shm creator
+    LC_RgywWrcySHMStrategy shm_creation_strategy(params.pattern_shm_params.min_number_pattern_shm,
+                                                 params.pattern_shm_params.max_number_pattern_shm,
+                                                 params.pattern_shm_params.substitution_propability);
+    LC_SHMCreator shm_creator(shm_creation_strategy);
 
     for(auto it = base_repertoire->begin(); it != base_repertoire->end(); it++) {
         cout << "New base antibody, multiplicity: " << it->Multiplicity() << endl;
         for(size_t i = 0; i < it->Multiplicity(); i++) {
             auto variable_region_ptr = it->IgVariableRegion()->Clone();
 
-            //variable_region_ptr = shm_creator.CreateSHM(variable_region_ptr);
+            variable_region_ptr = shm_creator.CreateSHM(variable_region_ptr);
             size_t multiplicity = mutated_multiplicity_creator.AssignMultiplicity(variable_region_ptr);
             mutated_repertoire->Add(LC_Cluster(variable_region_ptr, multiplicity));
             cout << "----" << endl;
