@@ -70,19 +70,27 @@ HC_Repertoire_Ptr CreateMutatedRepertoire(HC_InputParams params, HC_Repertoire_P
     HC_ExponentialMultiplicityCreator mutated_multiplicity_creator(mutated_lambda);
 
     // shm creator
-    HC_RgywWrcySHMStrategy shm_creation_strategy(params.pattern_shm_params.min_number_pattern_shm,
+    HC_RgywWrcySHMStrategy shm_creation_strategy1(params.pattern_shm_params.min_number_pattern_shm,
                                                  params.pattern_shm_params.max_number_pattern_shm,
                                                  params.pattern_shm_params.substitution_propability);
-    HC_SHMCreator shm_creator(shm_creation_strategy);
+    HC_CDRBasedRandomSHMStrategy shm_creation_strategy2(params.cdr_shm_params.min_number_mutations,
+                                                        params.cdr_shm_params.max_number_mutations,
+                                                        params.cdr_shm_params.mutation_in_fr_prop);
+    HC_CompositeSHMCreationStrategy composite_shm_strategy(shm_creation_strategy1, shm_creation_strategy2);
+    HC_SHMCreator shm_creator(composite_shm_strategy);
 
     for(auto it = base_repertoire->begin(); it != base_repertoire->end(); it++) {
         cout << "New base antibody, multiplicity: " << it->Multiplicity() << endl;
         for(size_t i = 0; i < it->Multiplicity(); i++) {
             auto variable_region_ptr = it->IgVariableRegion()->Clone();
 
+            cout << "Old sequence: " << variable_region_ptr->Sequence() << endl;
+
             variable_region_ptr = shm_creator.CreateSHM(variable_region_ptr);
             size_t multiplicity = mutated_multiplicity_creator.AssignMultiplicity(variable_region_ptr);
             mutated_repertoire->Add(HC_Cluster(variable_region_ptr, multiplicity));
+
+            cout << "New sequence: " << variable_region_ptr->Sequence() << endl;
             cout << "----" << endl;
         }
         cout << "-----------------------------" << endl;
@@ -102,5 +110,10 @@ int CreateHCRepertoire(HC_InputParams params) {
     }
 
     HC_Repertoire_Ptr mutated_repertoire = CreateMutatedRepertoire(params, base_repertoire);
+
+    cout << "Mutated repertoire:" << endl;
+    for(auto it = mutated_repertoire->begin(); it != mutated_repertoire->end(); it++) {
+        cout << it->IgVariableRegion()->VDJ_Recombination()->Sequence() << " " << it->Multiplicity() << endl;
+    }
     return 0;
 }

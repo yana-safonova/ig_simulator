@@ -2,7 +2,7 @@
 
 #include "../include_me.hpp"
 
-enum SHMAction { SubstitutionSHM, DeletionSHM, InsertionSHM };
+enum SHMAction { UndefinedSHM, SubstitutionSHM, DeletionSHM, InsertionSHM };
 
 class SHM {
     size_t position_;
@@ -18,6 +18,10 @@ class SHM {
     string insertion_;
 
 public:
+    SHM() :
+        position_(size_t(-1)),
+        action_(UndefinedSHM) { }
+
     SHM(size_t position, SHMAction action) :
             position_(position),
             action_(action) { }
@@ -88,35 +92,35 @@ ostream& operator<<(ostream& out, const SHM &shm) {
 // ----------------------------------------------------------------------------
 
 class SHMSettings {
-    vector<SHM> mutations_;
-    set<size_t> position_set_;
+//    vector<SHM> mutations_;
+//    set<size_t> position_set_;
+    map<size_t, SHM> pos_mutation_map_;
 
 public:
     void Add(SHM mutation) {
-        if(position_set_.find(mutation.Position()) != position_set_.end())
+        if(pos_mutation_map_.find(mutation.Position()) != pos_mutation_map_.end())
             return;
-        mutations_.push_back(mutation);
-        position_set_.insert(mutation.Position());
+        pos_mutation_map_[mutation.Position()] = mutation;
     }
 
-    size_t Size() const { return mutations_.size(); }
+    size_t Size() const { return pos_mutation_map_.size(); }
 
-    typedef vector<SHM>::iterator shm_iterator;
+    typedef map<size_t, SHM>::iterator shm_iterator;
 
-    shm_iterator begin() { return mutations_.begin(); }
+    shm_iterator begin() { return pos_mutation_map_.begin(); }
 
-    shm_iterator end() { return mutations_.end(); }
+    shm_iterator end() { return pos_mutation_map_.end(); }
 
-    typedef vector<SHM>::const_iterator shm_citerator;
+    typedef map<size_t, SHM>::const_iterator shm_citerator;
 
-    shm_citerator cbegin() const { return mutations_.cbegin(); }
+    shm_citerator cbegin() const { return pos_mutation_map_.cbegin(); }
 
-    shm_citerator cend() const { return mutations_.cend(); }
+    shm_citerator cend() const { return pos_mutation_map_.cend(); }
 };
 
 ostream& operator<<(ostream &out, const SHMSettings &settings) {
     out << "# mutations: " << settings.Size() << endl;
     for(auto it = settings.cbegin(); it != settings.cend(); it++)
-        out << *it << endl;
+        out << it->second << endl;
     return out;
 }

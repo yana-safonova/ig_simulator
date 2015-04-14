@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
     input_params.basic_repertoire_params.final_repertoire_size = 750;
 
     input_params.pattern_shm_params = PatternSHMParams::CreateStandardParams();
+    input_params.cdr_shm_params = CDR_SHMParams::CreateStandardParams();
 
     CreateHCRepertoire(input_params);
 }

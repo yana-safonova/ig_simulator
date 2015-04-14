@@ -38,7 +38,29 @@ struct PatternSHMParams {
             substitution_propability(0) { }
 
     static PatternSHMParams CreateStandardParams() {
-        return PatternSHMParams(2, 5, .8);
+        return PatternSHMParams(1, 5, .8);
+    }
+};
+
+struct CDR_SHMParams {
+    size_t min_number_mutations;
+    size_t max_number_mutations;
+    double mutation_in_fr_prop;
+
+    CDR_SHMParams() :
+        min_number_mutations(0),
+        max_number_mutations(0),
+        mutation_in_fr_prop(0) { }
+
+    CDR_SHMParams(size_t min_number_mutations,
+                  size_t max_number_mutations,
+                  double mutation_in_fr_prop) :
+            min_number_mutations(min_number_mutations),
+            max_number_mutations(max_number_mutations),
+            mutation_in_fr_prop(mutation_in_fr_prop) { }
+
+    static CDR_SHMParams CreateStandardParams() {
+        return CDR_SHMParams(1, 5, .25);
     }
 };
 
@@ -49,6 +71,7 @@ struct HC_InputParams {
 
     BasicRepertoireParams basic_repertoire_params;
     PatternSHMParams pattern_shm_params;
+    CDR_SHMParams cdr_shm_params;
 
     HC_InputParams() :
             vgenes_fname(""),
@@ -64,6 +87,7 @@ struct LC_InputParams {
 
     BasicRepertoireParams basic_repertoire_params;
     PatternSHMParams pattern_shm_params;
+    CDR_SHMParams cdr_shm_params;
 
     LC_InputParams() :
             vgenes_fname(""),

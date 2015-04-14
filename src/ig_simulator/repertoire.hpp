@@ -14,7 +14,28 @@ class IgVariableRegion {
     bool update_seq_;
 
     void ComputeSequence() {
-        // do something
+        string new_sequence = "";
+        size_t old_seq_ptr = 0;
+        for(auto it = shm_settings_.begin(); it != shm_settings_.end(); it++) {
+            size_t shm_pos = it->first;
+            // append all between old ptr and shm pos
+            for(size_t i = old_seq_ptr; i < shm_pos; i++)
+                new_sequence += sequence_[i];
+            if(it->second.IsSubstitution()) {
+                new_sequence += it->second.GetSubstitution();
+                old_seq_ptr = shm_pos + 1;
+            }
+            else if(it->second.IsDeletion()) {
+                old_seq_ptr = shm_pos + it->second.GetNumDeleted();
+            }
+            else if(it->second.IsInsertion()) {
+                new_sequence += it->second.GetInsertedString();
+                old_seq_ptr = shm_pos + 1;
+            }
+        }
+        for(size_t i = old_seq_ptr; i < sequence_.size(); i++)
+            new_sequence += sequence_[i];
+        sequence_ = new_sequence;
         update_seq_ = false;
     }
 
@@ -48,7 +69,9 @@ public:
         return sequence_;
     }
 
-    size_t Length() { return Sequence().size(); }
+    size_t Length() {
+        return Sequence().size();
+    }
 
     typedef shared_ptr<IgVariableRegion<VDJ_Recombination_Ptr> > IgVariableRegionPtr;
 

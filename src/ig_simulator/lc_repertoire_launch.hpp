@@ -68,10 +68,14 @@ LC_Repertoire_Ptr CreateMutatedLCRepertoire(LC_InputParams params, LC_Repertoire
     LC_ExponentialMultiplicityCreator mutated_multiplicity_creator(mutated_lambda);
 
     // shm creator
-    LC_RgywWrcySHMStrategy shm_creation_strategy(params.pattern_shm_params.min_number_pattern_shm,
-                                                 params.pattern_shm_params.max_number_pattern_shm,
-                                                 params.pattern_shm_params.substitution_propability);
-    LC_SHMCreator shm_creator(shm_creation_strategy);
+    LC_RgywWrcySHMStrategy shm_creation_strategy1(params.pattern_shm_params.min_number_pattern_shm,
+                                                  params.pattern_shm_params.max_number_pattern_shm,
+                                                  params.pattern_shm_params.substitution_propability);
+    LC_CDRBasedRandomSHMStrategy shm_creation_strategy2(params.cdr_shm_params.min_number_mutations,
+                                                        params.cdr_shm_params.max_number_mutations,
+                                                        params.cdr_shm_params.mutation_in_fr_prop);
+    LC_CompositeSHMCreationStrategy composite_shm_strategy(shm_creation_strategy1, shm_creation_strategy2);
+    LC_SHMCreator shm_creator(composite_shm_strategy);
 
     for(auto it = base_repertoire->begin(); it != base_repertoire->end(); it++) {
         cout << "New base antibody, multiplicity: " << it->Multiplicity() << endl;
