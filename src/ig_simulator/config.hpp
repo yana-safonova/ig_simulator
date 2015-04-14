@@ -20,6 +20,13 @@ struct BasicRepertoireParams {
         final_repertoire_size(final_repertoire_size) { }
 };
 
+ostream& operator<<(ostream &out, const BasicRepertoireParams &params) {
+    out << "Base repertoire size: " << params.base_repertoire_size << endl;
+    out << "Expected size of mutated repertoire: " << params.mutated_repertoire_size << endl;
+    out << "Expected size of final repertoire: " << params.final_repertoire_size << endl;
+    return out;
+}
+
 struct PatternSHMParams {
     size_t min_number_pattern_shm;
     size_t max_number_pattern_shm;
@@ -79,6 +86,12 @@ struct HC_InputParams {
             jgenes_fname(""),
             basic_repertoire_params(),
             pattern_shm_params() { }
+
+    void PrintDatabaseParams() {
+        cout << "V gene file: " << vgenes_fname << endl;
+        cout << "D gene file: " << dgenes_fname << endl;
+        cout << "J gene file: " << jgenes_fname << endl;
+    }
 };
 
 struct LC_InputParams {
@@ -94,5 +107,10 @@ struct LC_InputParams {
             jgenes_fname(""),
             basic_repertoire_params(),
             pattern_shm_params() { }
+
+    void PrintDatabaseParams() {
+        cout << "V gene file: " << vgenes_fname << endl;
+        cout << "J gene file: " << jgenes_fname << endl;
+    }
 };
 

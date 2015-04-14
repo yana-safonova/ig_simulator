@@ -47,8 +47,6 @@ LC_Repertoire_Ptr CreateBaseLCRepertoire(LC_InputParams params, LC_GenesDatabase
         vdj = remover.CreateRemovingSettings(vdj);
         vdj = p_creator.CreatePNucleotides(vdj);
         vdj = n_creator.CreateNNucleotides(vdj);
-        cout << (*vdj);
-        cout << "-----------------" << endl;
 
         LC_VariableRegionPtr ig_variable_region = LC_VariableRegionPtr(new LC_VariableRegion(vdj));
         ig_variable_region = cdr_labeler.LabelCDRs(ig_variable_region);
@@ -57,6 +55,13 @@ LC_Repertoire_Ptr CreateBaseLCRepertoire(LC_InputParams params, LC_GenesDatabase
         base_repertoire->Add(LC_Cluster(ig_variable_region, multiplicity));
     }
     return base_repertoire;
+}
+
+void PrintBaseLCRepertoire(LC_Repertoire_Ptr base_repertoire) {
+    for(auto it = base_repertoire->begin(); it != base_repertoire->end(); it++) {
+        cout << it->IgVariableRegion()->VDJ_Recombination()->Sequence() << " " << it->Multiplicity() << endl;
+        cout << it->IgVariableRegion()->GetCDRSettings();
+    }
 }
 
 LC_Repertoire_Ptr CreateMutatedLCRepertoire(LC_InputParams params, LC_Repertoire_Ptr base_repertoire) {
@@ -78,31 +83,36 @@ LC_Repertoire_Ptr CreateMutatedLCRepertoire(LC_InputParams params, LC_Repertoire
     LC_SHMCreator shm_creator(composite_shm_strategy);
 
     for(auto it = base_repertoire->begin(); it != base_repertoire->end(); it++) {
-        cout << "New base antibody, multiplicity: " << it->Multiplicity() << endl;
         for(size_t i = 0; i < it->Multiplicity(); i++) {
             auto variable_region_ptr = it->IgVariableRegion()->Clone();
-
             variable_region_ptr = shm_creator.CreateSHM(variable_region_ptr);
             size_t multiplicity = mutated_multiplicity_creator.AssignMultiplicity(variable_region_ptr);
             mutated_repertoire->Add(LC_Cluster(variable_region_ptr, multiplicity));
-            cout << "----" << endl;
         }
-        cout << "-----------------------------" << endl;
-        return mutated_repertoire;
     }
     return mutated_repertoire;
 }
 
-int CreateLCRepertoire(LC_InputParams params) {
+void CreateLCRepertoire(LC_InputParams params) {
+    cout << "======== Simulation of light chain repertoire starts" << endl;
+    cout << "Repertoire parameters: " << endl;
+    cout << params.basic_repertoire_params << endl;
+
+    cout << "Database parameters: " << endl;
+    params.PrintDatabaseParams();
+    cout << endl;
+
     auto lc_database = CreateLCDatabase(params);
+
+    cout << "==== Generation of base repertoire" << endl;
     LC_Repertoire_Ptr base_repertoire = CreateBaseLCRepertoire(params, lc_database);
+    cout << "Base repertoire consists of " << base_repertoire->Size() << " sequences with total multiplicities " <<
+    base_repertoire->NumberAntibodies() << endl << endl;
 
-    cout << "Base repertoire:" << endl;
-    for(auto it = base_repertoire->begin(); it != base_repertoire->end(); it++) {
-        cout << it->IgVariableRegion()->VDJ_Recombination()->Sequence() << " " << it->Multiplicity() << endl;
-        cout << it->IgVariableRegion()->GetCDRSettings();
-    }
-
+    cout << "==== Generation of mutated repertoire" << endl;
     LC_Repertoire_Ptr mutated_repertoire = CreateMutatedLCRepertoire(params, base_repertoire);
-    return 0;
+    cout << "Mutated repertoire consists of " << mutated_repertoire->Size() <<
+        " sequences with total multiplicities " << mutated_repertoire->NumberAntibodies() << endl << endl;
+
+    cout << "======== Simulation of heavy chain repertoire ends" << endl;
 }

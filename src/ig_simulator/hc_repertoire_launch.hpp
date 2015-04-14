@@ -17,7 +17,7 @@ HC_GenesDatabase_Ptr CreateHCDatabase(HC_InputParams params) {
     return hc_database;
 }
 
-HC_Repertoire_Ptr CreateBaseRepertoire(HC_InputParams params, HC_GenesDatabase_Ptr hc_database) {
+HC_Repertoire_Ptr CreateBaseHCRepertoire(HC_InputParams params, HC_GenesDatabase_Ptr hc_database) {
     HC_SimpleRecombinator hc_vdj_recombinator(hc_database, HC_SimpleRecombinationCreator(hc_database));
 
     // endonuclease remover
@@ -49,8 +49,6 @@ HC_Repertoire_Ptr CreateBaseRepertoire(HC_InputParams params, HC_GenesDatabase_P
         vdj = remover.CreateRemovingSettings(vdj);
         vdj = p_creator.CreatePNucleotides(vdj);
         vdj = n_creator.CreateNNucleotides(vdj);
-        cout << (*vdj);
-        cout << "-----------------" << endl;
 
         HC_VariableRegionPtr ig_variable_region = HC_VariableRegionPtr(new HC_VariableRegion(vdj));
         ig_variable_region = cdr_labeler.LabelCDRs(ig_variable_region);
@@ -61,7 +59,14 @@ HC_Repertoire_Ptr CreateBaseRepertoire(HC_InputParams params, HC_GenesDatabase_P
     return base_repertoire;
 }
 
-HC_Repertoire_Ptr CreateMutatedRepertoire(HC_InputParams params, HC_Repertoire_Ptr base_repertoire) {
+void PrintBaseHCRepertoire(HC_Repertoire_Ptr base_repertoire) {
+    for(auto it = base_repertoire->begin(); it != base_repertoire->end(); it++) {
+        cout << it->IgVariableRegion()->VDJ_Recombination()->Sequence() << " " << it->Multiplicity() << endl;
+        cout << it->IgVariableRegion()->GetCDRSettings();
+    }
+}
+
+HC_Repertoire_Ptr CreateMutatedHCRepertoire(HC_InputParams params, HC_Repertoire_Ptr base_repertoire) {
     HC_Repertoire_Ptr mutated_repertoire(new HC_Repertoire());
 
     // mutated multiplicity creator
@@ -80,40 +85,42 @@ HC_Repertoire_Ptr CreateMutatedRepertoire(HC_InputParams params, HC_Repertoire_P
     HC_SHMCreator shm_creator(composite_shm_strategy);
 
     for(auto it = base_repertoire->begin(); it != base_repertoire->end(); it++) {
-        cout << "New base antibody, multiplicity: " << it->Multiplicity() << endl;
         for(size_t i = 0; i < it->Multiplicity(); i++) {
             auto variable_region_ptr = it->IgVariableRegion()->Clone();
-
-            cout << "Old sequence: " << variable_region_ptr->Sequence() << endl;
-
             variable_region_ptr = shm_creator.CreateSHM(variable_region_ptr);
             size_t multiplicity = mutated_multiplicity_creator.AssignMultiplicity(variable_region_ptr);
             mutated_repertoire->Add(HC_Cluster(variable_region_ptr, multiplicity));
-
-            cout << "New sequence: " << variable_region_ptr->Sequence() << endl;
-            cout << "----" << endl;
         }
-        cout << "-----------------------------" << endl;
-        return mutated_repertoire;
     }
     return mutated_repertoire;
 }
 
-int CreateHCRepertoire(HC_InputParams params) {
-    auto hc_database = CreateHCDatabase(params);
-    HC_Repertoire_Ptr base_repertoire = CreateBaseRepertoire(params, hc_database);
-
-    cout << "Base repertoire:" << endl;
-    for(auto it = base_repertoire->begin(); it != base_repertoire->end(); it++) {
-        cout << it->IgVariableRegion()->VDJ_Recombination()->Sequence() << " " << it->Multiplicity() << endl;
-        cout << it->IgVariableRegion()->GetCDRSettings();
-    }
-
-    HC_Repertoire_Ptr mutated_repertoire = CreateMutatedRepertoire(params, base_repertoire);
-
-    cout << "Mutated repertoire:" << endl;
+void PrintMutatedHCRepertoire(HC_Repertoire_Ptr mutated_repertoire) {
     for(auto it = mutated_repertoire->begin(); it != mutated_repertoire->end(); it++) {
         cout << it->IgVariableRegion()->VDJ_Recombination()->Sequence() << " " << it->Multiplicity() << endl;
     }
-    return 0;
+}
+
+void CreateHCRepertoire(HC_InputParams params) {
+    cout << "======== Simulation of heavy chain repertoire starts" << endl;
+    cout << "Repertoire parameters: " << endl;
+    cout << params.basic_repertoire_params << endl;
+
+    cout << "Database parameters: " << endl;
+    params.PrintDatabaseParams();
+    cout << endl;
+
+    auto hc_database = CreateHCDatabase(params);
+
+    cout << "==== Generation of base repertoire" << endl;
+    HC_Repertoire_Ptr base_repertoire = CreateBaseHCRepertoire(params, hc_database);
+    cout << "Base repertoire consists of " << base_repertoire->Size() << " sequences with total multiplicities " <<
+            base_repertoire->NumberAntibodies() << endl << endl;
+
+    cout << "==== Generation of mutated repertoire" << endl;
+    HC_Repertoire_Ptr mutated_repertoire = CreateMutatedHCRepertoire(params, base_repertoire);
+    cout << "Mutated repertoire consists of " << mutated_repertoire->Size() <<
+            " sequences with total multiplicities " << mutated_repertoire->NumberAntibodies() << endl << endl;
+
+    cout << "======== Simulation of heavy chain repertoire ends" << endl;
 }

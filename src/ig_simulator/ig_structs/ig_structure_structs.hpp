@@ -219,6 +219,7 @@ public:
     // removing settings
     void AddRemovingSettings(LC_RemovingSettings removing_settings) {
         removing_settings_ = removing_settings;
+        update_sequence_ = true;
     }
 
     const LC_RemovingSettings RemovingSettings() const { return removing_settings_; }
@@ -226,6 +227,7 @@ public:
     // p insertion settings
     void AddPInsertionSettings(LC_PInsertionSettings p_insertion_settings) {
         p_insertion_settings_ = p_insertion_settings;
+        update_sequence_ = true;
     }
 
     const LC_PInsertionSettings PInsertionSettings() const { return p_insertion_settings_; }
@@ -233,6 +235,7 @@ public:
     // n insertion settings
     void AddNInsertionSettings(LC_NInsertionSettings n_insertion_settings) {
         n_insertion_settings_ = n_insertion_settings;
+        update_sequence_ = true;
     }
 
     const LC_NInsertionSettings NInsertionSettings() const { return n_insertion_settings_; }

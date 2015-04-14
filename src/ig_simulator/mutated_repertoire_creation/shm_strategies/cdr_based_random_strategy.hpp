@@ -70,7 +70,6 @@ public:
             else {
                 shm_settings.Add(CreateMutationInFR(ig_variable_region_ptr));
             }
-        cout << "Number of introduced mutations: " << num_mutations << endl;
         return shm_settings;
     }
 };

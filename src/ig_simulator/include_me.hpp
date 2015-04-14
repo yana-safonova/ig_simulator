@@ -34,3 +34,11 @@ char GetAnotherRandomNucleotide(const string &seq, size_t pos) {
         rand_nucl = GetRandomNucleotide();
     return rand_nucl;
 }
+
+template<typename T>
+T StringToType(string str) {
+    stringstream ss(str);
+    T t;
+    ss >> t;
+    return t;
+}

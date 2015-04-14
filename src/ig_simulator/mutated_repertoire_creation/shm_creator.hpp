@@ -14,8 +14,6 @@ public:
 
     IgVariableRegionPtr CreateSHM(IgVariableRegionPtr ig_variable_region_ptr) {
         SHMCreationSettings settings =  strategy_.CreateSHM(ig_variable_region_ptr);
-        cout << "Creation SHM settings" << endl;
-        cout << settings;
         ig_variable_region_ptr->SetSHMSettings(settings);
         return ig_variable_region_ptr;
     }
@@ -34,9 +32,7 @@ public:
         cdr_based_strategy_(cdr_based_strategy) { }
 
     SHMSettings CreateSHM(IgVariableRegionPtr ig_variable_region_ptr) {
-        cout << "RgywWrcySHMStrategy starts" << endl;
         SHMSettings shm_settings1 = rgyw_wrcy_strategy_.CreateSHM(ig_variable_region_ptr);
-        cout << "CDRBasedRandomSHMStrategy starts" << endl;
         SHMSettings shm_settings2 = cdr_based_strategy_.CreateSHM(ig_variable_region_ptr);
         for(auto it = shm_settings2.begin(); it != shm_settings2.end(); it++)
             shm_settings1.Add(it->second);

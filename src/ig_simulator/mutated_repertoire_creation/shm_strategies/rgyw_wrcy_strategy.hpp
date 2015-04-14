@@ -63,7 +63,6 @@ class RgywWrcySHMStrategy {
                 else if(i - hot_spot_pos[hot_spot_pos.size() - 1] >= 3)
                     hot_spot_pos.push_back(i);
             }
-        cout << "Detected " << hot_spot_pos.size() << " RGYW/WRCY hotspots" << endl;
         return hot_spot_pos;
     }
 
@@ -100,7 +99,6 @@ public:
         set<size_t> mutation_pos = RandomlyAddMutations(hotspot_pos);
         for(auto it = mutation_pos.begin(); it != mutation_pos.end(); it++)
             settings.Add(CreateMutation(ab_string, *it));
-        cout << "Number of introduced mutations: " << mutation_pos.size() << endl;
         return settings;
     }
 };
