@@ -19,9 +19,33 @@
     </section>
 
     <section class="main-content">
-      <p>IgRepertoireConstructor is a tool for construction of antibody repertoire from Illumina Ig-Seq library.
-IgRepertoireConstructor takes as an input immunosequencing reads that cover variable regions of antibodies and returns antibody repertoire constructed from the given reads as its output.</br>
-<img src="figures/base_seq_mult.png" width = "50%" alt="base_sequences_lengths"></p>
+      <p><b>IgSimulator</b> is a tool for simulation of antibody repertoire and Ig-seq library. 
+IgSimulator is designed for testing and benchmarking tools for reconstruction of Ig repertoires.</br></p>
+
+    <p>
+    IgSimulator generates:
+        <ul>
+            <li>FASTA file with reference Ig repertoire</li>
+            <li>FASTQ reads covering variable regions of simulated antibodies</li>
+            <li>Ideal repertoire corresponding to Ig-seq library in CLUSTERES.FA and RCM format (details can be found <a href = 'http://bioinf.spbau.ru/igtools'>here</a>).</li>
+            <li>Figures showing statistics of simulated repertoire: </li>
+        <ul>
+    </p>
+
+<table align = "center" border = "0" bordercolor="white">
+    <tr>
+        <td><img src="figures/base_seq_lens.png" width = "100%" alt="base_sequences_lengths"></td>
+        <td><img src="figures/shm_positions.png" width = "100%" alt="shm_positions"></td>
+    </tr>
+    <tr>
+        <td>Histogram of base sequence lengths distribution.</td>
+        <td>Histogram of relative SHM positions distribution. Reds bars correspond to CDR positions.</td> 
+    </tr>
+</table></br>
+
+<p>
+    IgSimulator manual can be found <a href = 'manual.html'>here</a>.
+</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/yana-safonova/ig_simulator">IgSimulator</a> is maintained by <a href="https://github.com/yana-safonova">yana-safonova</a>.</span>
