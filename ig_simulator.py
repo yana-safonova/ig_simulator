@@ -108,11 +108,11 @@ def usage(log):
 
     log.info("\nAdvanced options:")
     log.info("  --vgenes\t\t<filename>\t\t\tFASTA file with Ig germline V genes")
-    log.info("  \t\t\t\t\t\t\t[default: './data/human_ig_germline_genes/human_IGHV.fa']")
+    log.info("  \t\t\t\t\t\t\t[default: 'data/human_ig_germline_genes/human_IGHV.fa' or 'data/human_ig_germline_genes/human_IGKV.fa']")
     log.info("  --dgenes\t\t<filename>\t\t\tFASTA file with Ig germline D genes")
-    log.info("  \t\t\t\t\t\t\t[default: './data/human_ig_germline_genes/human_IGHD.fa']")
+    log.info("  \t\t\t\t\t\t\t[default: 'data/human_ig_germline_genes/human_IGHD.fa']")
     log.info("  --jgenes\t\t<filename>\t\t\tFASTA file with Ig germline J genes")
-    log.info("  \t\t\t\t\t\t\t[default: './data/human_ig_germline_genes/human_IGHJ.fa']\n")
+    log.info("  \t\t\t\t\t\t\t[default: 'data/human_ig_germline_genes/human_IGHJ.fa' or 'data/human_ig_germline_genes/human_IGKJ.fa']\n")
 
     #log.info("  --tech\t\t<illumina/454>\t\t\tNGS technology for read simulation")
     #log.info("  --min-overlap\t\t<int>\t\t\t\tminimal allowed size of overlap in paired reads merging [default: '60']")
@@ -131,6 +131,11 @@ def CheckVDJgenes(options, self_dir_path, log):
     inner_vgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGHV.fa")
     inner_dgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGHD.fa")
     inner_jgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGHJ.fa")
+    if options.chain_type == "LC":
+        inner_vgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGKV.fa")
+        inner_jgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGKJ.fa")
+        
+
     if not os.path.exists(options.vgenes_path):
         if not os.path.exists(os.path.abspath(inner_vgenes)):
             log.info("ERROR: FASTA file with HV genes was not found")
@@ -138,7 +143,7 @@ def CheckVDJgenes(options, self_dir_path, log):
         options.vgenes_path = os.path.join(self_dir_path, inner_vgenes)
         log.info("FASTA file with V genes was not specified. IMGT database " + options.vgenes_path + " will be used by default")
 
-    if not os.path.exists(options.dgenes_path):
+    if not os.path.exists(options.dgenes_path) and options == "HC":
         if not os.path.exists(os.path.abspath(inner_dgenes)):
             log.info("ERROR: FASTA file with HD genes was not found")
             sys.exit(1)
@@ -456,9 +461,9 @@ def ParseCommandLine(options, log):
         elif opt == "--tech":
             options_dict.technology = arg
         elif opt == '--test':
-            options_dict.num_bases = 100
-            options_dict.num_mutated = 500
-            options_dict.repertoire_size = 5000
+            options_dict.num_bases = 10
+            options_dict.num_mutated = 50
+            options_dict.repertoire_size = 100
             options_dict.output_dir = 'ig_simulator_test/'
         elif opt == '--skip-drawing':
             options_dict.draw_hist = False
