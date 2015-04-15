@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
 	string fname(argv[1]);
 	vector<fastq_read> reads = SingleFastqReader(fname).ReadFile();
-	cout << reads.size() << " were read from " << argv[1] << endl;
+	cout << reads.size() << " reads were extracted from " << argv[1] << endl;
 
 	Clusterization clusters(reads);
 	string prefix = "ID=";

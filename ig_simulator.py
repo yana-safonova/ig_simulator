@@ -385,9 +385,13 @@ def DetermineErrorType(options, arg):
         options.sim_mode = True
 
 def CheckOptionsCorrectness(options, log):
+    if options.output_dir == "":
+        log.info("ERROR: Output directory (-o/--output-dir) is missing")
+        usage(log)
+        sys.exit(1)
     if options.chain_type != 'HC' and options.chain_type != 'LC':
         log.info("ERROR: Incorrect type of chain (--chain-type) should be equal HC or LC")
-        usage.log()
+        usage(log)
         sys.exit(1) 
     if options.num_bases == 0:
         log.info("ERROR: Number of base sequences (--num-bases) is a mandatory parameter!")
