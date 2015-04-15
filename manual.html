@@ -6,7 +6,6 @@
             background-color: lightgray;
         }
     </style>
-    <link rel="shortcut icon" href="ig_tools.ico">
 </head>
 
   <style>
@@ -104,7 +103,7 @@ If the installation is successful, you will find the following information at th
 Command line:
 <pre class="code">
 <code>
-    ./ig_simulator.py [options] --num-bases N1 --num-mutated N2 --repertoire-size N3 -o &lt;output_dir>
+    ./ig_simulator.py [options] --chain-type TYPE --num-bases N1 --num-mutated N2 --repertoire-size N3 -o &lt;output_dir>
 </code>
 </pre>
 
@@ -124,13 +123,8 @@ expected number of mutated sequences (required).</br></br>
 <code>--repertoire-size &lt;int></code></br>
 expected reference repertoire size (required).</br></br>
 
-<code>--HC-LC &lt;int-int></code></br>
-percentage of heavy and light chain reads in final repertoire. Default value is '100-0' (Option is in developing).</br></br>
-
-<!--
-<code>--chain-type &lt;heavy/light></code></br>
-type of simulated chains (required).</br></br>
--->
+<code>--chain-type HC or LC</code></br>
+type of chain that can be used for repertoire simulation. Default value is 'HC'.</br></br>
 
 <code>--test</code></br>
 runs toy test data set (see Section <a href = "#test_datasets">3.4</a>). Command line corresponding to the test run is equivalent to the following line:
@@ -144,26 +138,14 @@ runs toy test data set (see Section <a href = "#test_datasets">3.4</a>). Command
 
 <a id = "simulator_genes"></a>
 <h3>3.2. Ig genes options:</h3>
-<code>--HV &lt;filename></code></br>
-FASTA file with Ig germline HV genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGHV.fa</code>.</br></br>
+<code>--vgenes &lt;filename></code></br>
+FASTA file with Ig germline V genes. Default value is <code>&lt;igtools_installation_directory>/data/human_ig_germline_genes/human_IGHV.fa</code> for heavy chain repertoire and <code>&lt;igtools_installation_directory>/data/human_ig_germline_genes/human_IGKV.fa</code> for light chain repertoire.</br></br>
 
-<code>--HD &lt;filename></code></br>
-FASTA file with Ig germline HD genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGHD.fa</code>.</br></br>
+<code>--dgenes &lt;filename></code></br>
+FASTA file with Ig germline D genes. Default value is <code>&lt;igtools_installation_directory>/data/human_ig_germline_genes/human_IGHD.fa</code> for heavy chain repertoire.</br></br>
 
-<code>--HJ &lt;filename></code></br>
-FASTA file with Ig germline HJ genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGHJ.fa</code>.</br></br>
-
-<code>--KV &lt;filename></code></br>
-FASTA file with Ig germline KV genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGKV.fa</code>.</br></br>
-
-<code>--KJ &lt;filename></code></br>
-FASTA file with Ig germline KJ genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGKJ.fa</code>.</br></br>
-
-<code>--LV &lt;filename></code></br>
-FASTA file with Ig germline LV genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGLV.fa</code>.</br></br>
-
-<code>--LJ &lt;filename></code></br>
-FASTA file with Ig germline LJ genes. Default value is <code>&lt;igtools_installation_directory>/src/ig_repertoire_reconstruction/human_ig_germline_genes/human_IGLJ.fa</code>.</br></br>
+<code>--jgenes &lt;filename></code></br>
+FASTA file with Ig germline J genes. Default value is <code>&lt;igtools_installation_directory>/data/human_ig_germline_genes/human_IGHJ.fa</code> for heavy chain repertoire and <code>&lt;igtools_installation_directory>/data/human_ig_germline_genes/human_IGKJ.fa</code> for light chain repertoire.</br></br>
 
 <!- ---------------------- ->
 
@@ -184,14 +166,14 @@ prints help.</br>
 To simulate heavy chain data set with 100 base sequences, ~500 mutated sequences and ~1500 sequences in the final repertoire size and, correspondingly, simulated Illumina library, run the following command: 
 <pre class = "code">
     <code>
-    ./ig_simulator.py --num-bases 100 --num-mutated 500 --repertoire-size 1500 -o ig_simulator_test 
+    ./ig_simulator.py  --chain-type HC --num-bases 100 --num-mutated 500 --repertoire-size 1500 -o ig_simulator_test 
     </code>
 </pre>
 
 If you want to additionally specify paths to V/D/J germline genes instead of using default IMGT database:
 <pre class = "code">
     <code>
-    ./ig_simulator.py --num-bases 100 --num-mutated 500 --repertoire-size 1500 \\
+    ./ig_simulator.py --chain-type HC --num-bases 100 --num-mutated 500 --repertoire-size 1500 \\
         --VH &lt;path_to_your_vgenes.fasta> --VD &lt;path_to_your_dgenes.fasta> --JH &lt;path_to_your_jgenes.fasta> -o ig_simulator_test 
     </code>
 </pre>
@@ -204,25 +186,39 @@ If you want to additionally specify paths to V/D/J germline genes instead of usi
 <ul>
     <li>Files with sequences</li>
     <ul>
-        <li><b>repertoire.fasta</b> - FASTA file with simulated antibody repertoire that will be used as reference for Illumina library simulation.</li>
-        <li><b>left_reads.fastq</b> - FASTQ file with left reads constructed using Grinder read simulator. Reads correspond to simulated Illumina MiSeq library.</li>  
-        <li><b>right_reads.fastq</b> - FASTQ file with right reads constructed using Grinder read simulator. Reads correspond to simulated Illumina MiSeq library.</li>  
+        <li><b>final_repertoire.fasta</b> - FASTA file with simulated antibody repertoire that will be used as reference for Illumina library simulation.</li>
+        <li><b>paired_reads1.fq</b> - FASTQ file with left reads constructed using ART read simulator. Reads correspond to simulated Illumina MiSeq library.</li>  
+        <li><b>paired_reads2.fq</b> - FASTQ file with right reads constructed using ART read simulator. Reads correspond to simulated Illumina MiSeq library.</li>  
         <li><b>merged_reads.fastq</b> - FASTQ file consructed as result of merging left and right files with reads. This file is expected to be input for <code>IgRepertoireConstruction</code> tool.</li>  
     </ul></br>
 
     <li>Files with statistics of the simulated repertoire:</li>
     <ul>
-        <li><b>base_repertoire.stats</b> contains information about repertoire of base sequences of simulated repertoire. Each line of this file corresponds to one base sequence and contains the following fields: 'nucleotide sequence', 'sequence length', and 'sequence frequency in base repetoire'. Fields are separated by 'tab'.</li>
-        <li><b>mutation_positions.stats</b> contains information about all introduced somatic hypermutations. Each line corresponds to one mutation and of this file includes two field (separated by 'tab'): 'mutation position' and 'sequence length'.</li>
-        <li><b>final_repertoire.stats</b> contains information about final repertoire. Each line corresponds to sequence of Ig variable region and include the following fields (separated by 'tab'): 'nucleotide sequence' and 'frequency'.</li>
+        <li><b>base_sequences.fasta</b> contains sequences of base repertoire.</li>
+        <li><b>base_multiplicities.txt</b> contains multiplicities of base sequences.</li>
+        <li><b>mutated_sequences.fasta</b> contains sequences of mutated repertoire.</li>
+        <li><b>mutated_multiplicities.txt</b> contains multiplicities of mutated sequences.</li>
+        <li><b>shm_positions.txt</b> contains information about all introduced somatic hypermutations. 
+        Each line corresponds to one mutation and of this file includes two field (separated by 'tab'): 'mutation position' and 'sequence length'.</li>
     </ul></br>
     
     <li>Visialization of the statistics for the simulated repertoire</li>
     <ul> 
-        <li><b>base_repertoire_lens.png</b> - PNG file with histogram of base sequences lengths distribution. If number of base sequences (controlled by option <code>--num-bases</code>) is enough large, distribution is expected to be normal. This file is created based on statistics from <b>base_repertoire.stats</b>.</li>
-        <li><b>base_repertoire_freqs.png</b> - PNG file with histogram of base sequences frequencies distribuition (expected to be exponential). This file is created based on statistics from <b>base_repertoire.stats</b>.</li>
-        <li><b>mutated_repertoire_freqs.png</b> - PNG file with histogram of distribuition of sequences in final repertoire (expected to be exponential). This file is created based on statistics from <b>final_repertoire.stats</b>.</li>
-        <li><b>mutation_positions.png</b> - PNG file with histogram of distribution of somatic hypermutations relative positions. This file is created based on statistics from <b>mutation_positions.stats</b>.</li>
+        <li><b>base_seq_lens.png</b> - PNG file with histogram of base sequences lengths distribution. 
+        If number of base sequences (controlled by option <code>--num-bases</code>) is enough large, distribution is expected to be normal. 
+        This file is created based on statistics from <b>base_repertoire.stats</b>.</li>
+
+        <li><b>base_seq_mult.png</b> - PNG file with histogram of base sequences multiplicities distribuition. 
+        This file is created based on statistics from <b>base_multiplicities.txt</b>.</li>
+
+        <li><b>mutated_seq_mult.png</b> - PNG file with histogram of mutated sequences distribuition in final repertoire. 
+        This file is created based on statistics from <b>mutated_multiplicities.txt</b>.</li>
+
+        <li><b>shm_positions.png</b> - PNG file with histogram of distribution of somatic hypermutations relative positions. 
+        This file is created based on statistics from <b>shm_positions.txt</b>.</li>
+
+        <li><b>paired_reads1.aln</b> and <b>paired_reads2.aln</b> show alignment of paired-end reads to reference repertoire.
+        Files are generated by ART read simulator.</li>
     </ul></br>
 
     <li>Files described ideal repertoire (see details in section <a href = "#repertoire_files">4</a>):</li>
