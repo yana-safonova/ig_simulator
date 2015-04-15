@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <time.h>
 
 size_t RandomInt(size_t max) {
     return rand() % max;

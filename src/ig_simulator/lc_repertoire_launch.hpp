@@ -34,8 +34,10 @@ LC_Repertoire_Ptr CreateBaseLCRepertoire(LC_InputParams params, LC_GenesDatabase
     LC_Repertoire_Ptr base_repertoire(new LC_Repertoire());
 
     // base multiplicity creator
-    LC_ExponentialMultiplicityCreator base_multiplicity_creator(params.basic_repertoire_params.base_repertoire_size,
-                                                                params.basic_repertoire_params.mutated_repertoire_size);
+    //LC_ExponentialMultiplicityCreator base_multiplicity_creator(params.basic_repertoire_params.base_repertoire_size,
+    //                                                            params.basic_repertoire_params.mutated_repertoire_size);
+    LC_PowerLawMultiplicityCreator base_multiplicity_creator(params.basic_repertoire_params.base_repertoire_size,
+                                                             params.basic_repertoire_params.mutated_repertoire_size);
 
     // cdr labeling
     LC_CDRLabelingStrategy cdr_labeling_strategy;
@@ -67,8 +69,10 @@ LC_Repertoire_Ptr CreateMutatedLCRepertoire(LC_InputParams params, LC_Repertoire
     LC_Repertoire_Ptr mutated_repertoire(new LC_Repertoire());
 
     // mutated multiplicity creator
-    LC_ExponentialMultiplicityCreator mutated_multiplicity_creator(base_repertoire->NumberAntibodies(),
-        params.basic_repertoire_params.final_repertoire_size);
+//    LC_ExponentialMultiplicityCreator mutated_multiplicity_creator(base_repertoire->NumberAntibodies(),
+//        params.basic_repertoire_params.final_repertoire_size);
+    LC_PowerLawMultiplicityCreator mutated_multiplicity_creator(base_repertoire->NumberAntibodies(),
+                                                             params.basic_repertoire_params.final_repertoire_size);
 
     // shm creator
     LC_RgywWrcySHMStrategy shm_creation_strategy1(params.pattern_shm_params.min_number_pattern_shm,
