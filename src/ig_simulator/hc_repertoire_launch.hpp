@@ -36,9 +36,10 @@ HC_Repertoire_Ptr CreateBaseHCRepertoire(HC_InputParams params, HC_GenesDatabase
     HC_Repertoire_Ptr base_repertoire(new HC_Repertoire());
 
     // base multiplicity creator
-    double base_lambda = double(params.basic_repertoire_params.base_repertoire_size) /
-            params.basic_repertoire_params.mutated_repertoire_size;
-    HC_ExponentialMultiplicityCreator base_multiplicity_creator(base_lambda);
+    //HC_ExponentialMultiplicityCreator base_multiplicity_creator(params.basic_repertoire_params.base_repertoire_size,
+    //                                                            params.basic_repertoire_params.mutated_repertoire_size);
+    HC_PowerLawMultiplicityCreator base_multiplicity_creator(params.basic_repertoire_params.base_repertoire_size,
+                                                          params.basic_repertoire_params.mutated_repertoire_size);
 
     // cdr labeling
     HC_CDRLabelingStrategy cdr_labeling_strategy;
@@ -70,9 +71,10 @@ HC_Repertoire_Ptr CreateMutatedHCRepertoire(HC_InputParams params, HC_Repertoire
     HC_Repertoire_Ptr mutated_repertoire(new HC_Repertoire());
 
     // mutated multiplicity creator
-    double mutated_lambda = double(base_repertoire->NumberAntibodies()) /
-            double(params.basic_repertoire_params.final_repertoire_size);
-    HC_ExponentialMultiplicityCreator mutated_multiplicity_creator(mutated_lambda);
+//    HC_ExponentialMultiplicityCreator mutated_multiplicity_creator(base_repertoire->NumberAntibodies(),
+//        params.basic_repertoire_params.final_repertoire_size);
+    HC_PowerLawMultiplicityCreator mutated_multiplicity_creator(base_repertoire->NumberAntibodies(),
+                                                          params.basic_repertoire_params.final_repertoire_size);
 
     // shm creator
     HC_RgywWrcySHMStrategy shm_creation_strategy1(params.pattern_shm_params.min_number_pattern_shm,
