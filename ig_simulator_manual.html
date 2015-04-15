@@ -195,9 +195,9 @@ If you want to additionally specify paths to V/D/J germline genes instead of usi
     <li>Files with statistics of the simulated repertoire:</li>
     <ul>
         <li><b>base_sequences.fasta</b> contains sequences of base repertoire.</li>
-        <li><b>base_multiplicities.txt</b> contains multiplicities of base sequences.</li>
+        <li><b>base_frequencies.txt</b> contains frequencies of base sequences.</li>
         <li><b>mutated_sequences.fasta</b> contains sequences of mutated repertoire.</li>
-        <li><b>mutated_multiplicities.txt</b> contains multiplicities of mutated sequences.</li>
+        <li><b>mutated_frequencies.txt</b> contains frequencies of mutated sequences.</li>
         <li><b>shm_positions.txt</b> contains information about all introduced somatic hypermutations. 
         Each line corresponds to one mutation and of this file includes two field (separated by 'tab'): 'mutation position' and 'sequence length'.</li>
     </ul></br>
@@ -208,10 +208,10 @@ If you want to additionally specify paths to V/D/J germline genes instead of usi
         If number of base sequences (controlled by option <code>--num-bases</code>) is enough large, distribution is expected to be normal. 
         This file is created based on statistics from <b>base_repertoire.stats</b>.</li>
 
-        <li><b>base_seq_mult.png</b> - PNG file with histogram of base sequences multiplicities distribuition. 
+        <li><b>base_seq_freqs.png</b> - PNG file with histogram of base sequence frequencies distribuition. 
         This file is created based on statistics from <b>base_multiplicities.txt</b>.</li>
 
-        <li><b>mutated_seq_mult.png</b> - PNG file with histogram of mutated sequences distribuition in final repertoire. 
+        <li><b>mutated_seq_freqs.png</b> - PNG file with histogram of mutated sequence frequencies distribuition in final repertoire. 
         This file is created based on statistics from <b>mutated_multiplicities.txt</b>.</li>
 
         <li><b>shm_positions.png</b> - PNG file with histogram of distribution of somatic hypermutations relative positions. 
@@ -275,6 +275,6 @@ They will help us to further improve IgSimulator.
 <br><br>
 If you have any troubles running IgSimulator, please send us log file from output output directory.
 <br><br>
-Address for communications: <a href="mailto:safonova.yana@gmail.com">safonova.yana@gmail.com</a> (Yana Safonova). 
+Address for communications: <a href="mailto:igtools_support@googlegroups.com">igtools_support@googlegroups.com</a>. 
 
 </body>
