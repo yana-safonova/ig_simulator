@@ -143,7 +143,7 @@ def CheckVDJgenes(options, self_dir_path, log):
         options.vgenes_path = os.path.join(self_dir_path, inner_vgenes)
         log.info("FASTA file with V genes was not specified. IMGT database " + options.vgenes_path + " will be used by default")
 
-    if not os.path.exists(options.dgenes_path) and options == "HC":
+    if not os.path.exists(options.dgenes_path) and options.chain_type == "HC":
         if not os.path.exists(os.path.abspath(inner_dgenes)):
             log.info("ERROR: FASTA file with HD genes was not found")
             sys.exit(1)
@@ -172,18 +172,18 @@ def CheckForRepertoireSimulationResults(options, log):
         log.info("ERROR: base sequences was not found")
         sys.exit(1)
 
-    options.base_multiplicities = os.path.join(options.output_dir, "base_multiplicities.txt")
+    options.base_multiplicities = os.path.join(options.output_dir, "base_frequencies.txt")
     if os.path.exists(options.base_multiplicities):
-        log.info("* Multiplicities of base sequences were written to " + options.base_multiplicities)
+        log.info("* Frequencies of base sequences were written to " + options.base_multiplicities)
     else:
-        log.info("ERROR: File with multiplicities of base sequences was not found")
+        log.info("ERROR: File with frequencies of base sequences was not found")
         sys.exit(1)
         
-    options.mutated_multiplicities = os.path.join(options.output_dir, "mutated_multiplicities.txt")
+    options.mutated_multiplicities = os.path.join(options.output_dir, "mutated_frequencies.txt")
     if os.path.exists(options.mutated_multiplicities):
-        log.info("* Multiplicities of mutated sequences were written to " + options.mutated_multiplicities)
+        log.info("* Frequencies of mutated sequences were written to " + options.mutated_multiplicities)
     else:
-        log.info("ERROR: File with multiplicities of mutated sequences was not found")
+        log.info("ERROR: File with frequencies of mutated sequences was not found")
         sys.exit(1)
 
     options.shm_positions = os.path.join(options.output_dir, "shm_positions.txt")
@@ -203,23 +203,23 @@ def DrawBaseStats(options, base_lens, base_freqs, log):
         log.info("ERROR: Histogram of distribution of base sequence lengths was not found")
         sys.exit(1)
     
-    hist_name2 = os.path.join(options.output_dir, "base_seq_mult.png")
-    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Base sequence multiplicity", ylabel = "# sequences", output_filename = hist_name2)
+    hist_name2 = os.path.join(options.output_dir, "base_seq_freqs.png")
+    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Base sequence frequency", ylabel = "# sequences", output_filename = hist_name2)
     drawing_utils.DrawHistogram(base_freqs, freq_hist_settings)
     if os.path.exists(hist_name2):
-        log.info("* Histogram of distribution of base sequence multiplicities was written to " + hist_name2)
+        log.info("* Histogram of distribution of base sequence frequencies was written to " + hist_name2)
     else:
-        log.info("ERROR: Histogram of distribution of base sequence multiplicities was not found")
+        log.info("ERROR: Histogram of distribution of base sequence frequencies was not found")
         sys.exit(1)
 
 def DrawMutatedStats(options, mutated_freqs, mutation_pos, log):
-    hist_name1 = os.path.join(options.output_dir, "mutated_seq_mult.png")
-    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Mutated sequence multiplicity", ylabel = "# sequences", output_filename = hist_name1)
+    hist_name1 = os.path.join(options.output_dir, "mutated_seq_freqs.png")
+    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Mutated sequence frequency", ylabel = "# sequences", output_filename = hist_name1)
     drawing_utils.DrawHistogram(mutated_freqs, freq_hist_settings)
     if os.path.exists(hist_name1):
-        log.info("* Histogram of distribution of mutated sequences multiplicities was written to " + hist_name1)
+        log.info("* Histogram of distribution of mutated sequence frequencies was written to " + hist_name1)
     else:
-        log.info("ERROR: Histogram of distribution of mutated sequences multiplicities was not found")
+        log.info("ERROR: Histogram of distribution of mutated sequence frequencies was not found")
         sys.exit(1)
 
     hist_name2 = os.path.join(options.output_dir, "shm_positions.png")

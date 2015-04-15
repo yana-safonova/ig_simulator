@@ -102,9 +102,9 @@ struct OutputParams {
 
     static OutputParams CreateStandardParams() {
         return OutputParams("base_sequences.fasta",
-                            "base_multiplicities.txt",
+                            "base_frequencies.txt",
                             "mutated_sequences.fasta",
-                            "mutated_multiplicities.txt",
+                            "mutated_frequencies.txt",
                             "shm_positions.txt",
                             "final_repertoire.fasta");
     }

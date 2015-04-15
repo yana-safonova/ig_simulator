@@ -187,8 +187,12 @@ public:
         for(auto it = begin(); it != end(); it++) {
             auto shm_settings = it->IgVariableRegion()->GetSHMSettings();
             size_t seq_length = it->Sequence().size();
-            for(auto shm = shm_settings.begin(); shm != shm_settings.end(); shm++)
+            for(auto shm = shm_settings.begin(); shm != shm_settings.end(); shm++) {
+                if(shm->first > seq_length)
+                    continue;
                 out << shm->first << "\t" << seq_length << endl;
+            }
+
         }
     }
 };
