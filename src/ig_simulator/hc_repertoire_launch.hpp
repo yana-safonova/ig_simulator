@@ -115,12 +115,25 @@ void CreateHCRepertoire(HC_InputParams params) {
     cout << "==== Generation of base repertoire" << endl;
     HC_Repertoire_Ptr base_repertoire = CreateBaseHCRepertoire(params, hc_database);
     cout << "Base repertoire consists of " << base_repertoire->Size() << " sequences with total multiplicities " <<
-            base_repertoire->NumberAntibodies() << endl << endl;
+            base_repertoire->NumberAntibodies() << endl;
+    base_repertoire->OutputSequences(params.output_params.base_sequence_fname);
+    base_repertoire->OutputMultiplicities(params.output_params.base_multiplicity_fname);
+    cout << "Base antibody sequences were written to " + params.output_params.base_sequence_fname << endl;
+    cout << "Base antibody multiplicities were written to " + params.output_params.base_multiplicity_fname << endl;
+    cout << endl;
 
     cout << "==== Generation of mutated repertoire" << endl;
     HC_Repertoire_Ptr mutated_repertoire = CreateMutatedHCRepertoire(params, base_repertoire);
     cout << "Mutated repertoire consists of " << mutated_repertoire->Size() <<
-            " sequences with total multiplicities " << mutated_repertoire->NumberAntibodies() << endl << endl;
+            " sequences with total multiplicities " << mutated_repertoire->NumberAntibodies() << endl;
+    mutated_repertoire->OutputSequences(params.output_params.mutated_sequence_fname);
+    mutated_repertoire->OutputMultiplicities(params.output_params.mutated_multiplicity_fname);
+    cout << "Mutated antibody sequences were written to " + params.output_params.mutated_sequence_fname << endl;
+    cout << "Mutated antibody multiplicities were written to " + params.output_params.mutated_multiplicity_fname << endl;
+    cout << endl;
+
+    mutated_repertoire->OutputRepertoire(params.output_params.final_repertoire_fname);
+    cout << "Final repertoire was written to " << params.output_params.final_repertoire_fname << endl << endl;
 
     cout << "======== Simulation of heavy chain repertoire ends" << endl;
 }

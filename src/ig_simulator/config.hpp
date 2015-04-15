@@ -71,11 +71,56 @@ struct CDR_SHMParams {
     }
 };
 
+struct OutputParams {
+    string base_sequence_fname;
+    string base_multiplicity_fname;
+    string mutated_sequence_fname;
+    string mutated_multiplicity_fname;
+    string final_repertoire_fname;
+
+    OutputParams() :
+            base_sequence_fname(),
+            base_multiplicity_fname(),
+            mutated_sequence_fname(),
+            mutated_multiplicity_fname(),
+            final_repertoire_fname() { }
+
+    OutputParams(string base_sequence_fname,
+        string base_multiplicity_fname,
+        string mutated_sequence_fname,
+        string mutated_multiplicity_fname,
+        string final_repertoire_fname) :
+            base_sequence_fname(base_sequence_fname),
+            base_multiplicity_fname(base_multiplicity_fname),
+            mutated_sequence_fname(mutated_sequence_fname),
+            mutated_multiplicity_fname(mutated_multiplicity_fname),
+            final_repertoire_fname(final_repertoire_fname) { }
+
+    static OutputParams CreateStandardParams() {
+        return OutputParams("base_sequences.fasta",
+                            "base_multiplicities.txt",
+                            "mutated_sequences.fasta",
+                            "mutated_multiplicities.txt",
+                            "final_repertoire.fasta");
+    }
+
+    void AddPrefix(string prefix) {
+        base_sequence_fname = prefix + base_sequence_fname;
+        base_multiplicity_fname = prefix + base_multiplicity_fname;
+        mutated_sequence_fname = prefix + mutated_sequence_fname;
+        mutated_multiplicity_fname = prefix + mutated_multiplicity_fname;
+        final_repertoire_fname = prefix + final_repertoire_fname;
+    }
+};
+
 struct HC_InputParams {
     string vgenes_fname;
     string dgenes_fname;
     string jgenes_fname;
 
+    string output_dir;
+
+    OutputParams output_params;
     BasicRepertoireParams basic_repertoire_params;
     PatternSHMParams pattern_shm_params;
     CDR_SHMParams cdr_shm_params;
@@ -98,6 +143,9 @@ struct LC_InputParams {
     string vgenes_fname;
     string jgenes_fname;
 
+    string output_dir;
+
+    OutputParams output_params;
     BasicRepertoireParams basic_repertoire_params;
     PatternSHMParams pattern_shm_params;
     CDR_SHMParams cdr_shm_params;

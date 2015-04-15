@@ -9,6 +9,10 @@
 #include <memory>
 #include "../utils/sequence_tools.hpp"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 size_t RandomInt(size_t max) {
     return rand() % max;
 }

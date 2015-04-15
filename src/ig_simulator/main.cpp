@@ -4,18 +4,18 @@
 
 
 /*
- * ./ig_simulator HC base_rep_size mutated_rep_size final_rep_size Vgene.fa Dgene.fa Jgene.fa
- * ./ig_simulator LC base_rep_size mutated_rep_size final_rep_size Vgene.fa Jgene.fa
+ * ./ig_simulator HC output_dir base_rep_size mutated_rep_size final_rep_size Vgene.fa Dgene.fa Jgene.fa
+ * ./ig_simulator LC output_dir base_rep_size mutated_rep_size final_rep_size Vgene.fa Jgene.fa
  */
 
 void HCUsage() {
     cout << "Usage for simulation heavy chain repertoire:" << endl;
-    cout << "./ig_simulator HC base_rep_size mutated_rep_size final_rep_size Vgene.fa Dgene.fa Jgene.fa" << endl;
+    cout << "./ig_simulator HC output_dir base_rep_size mutated_rep_size final_rep_size Vgene.fa Dgene.fa Jgene.fa" << endl;
 }
 
 void LCUsage() {
     cout << "Usage for simulation light chain repertoire:" << endl;
-    cout << "./ig_simulator LC base_rep_size mutated_rep_size final_rep_size Vgene.fa Jgene.fa" << endl;
+    cout << "./ig_simulator LC output_dir base_rep_size mutated_rep_size final_rep_size Vgene.fa Jgene.fa" << endl;
 }
 
 void Usage() {
@@ -34,33 +34,77 @@ ChainType ParseChainType(string arg) {
         return Unknown_chain;
 }
 
+void PrepareOutputDir(string output_dir) {
+    struct stat st = {0};
+    if (stat(output_dir.c_str(), &st) == -1) {
+        mkdir(output_dir.c_str(), 0700);
+    }
+}
+
+struct HCParamsIndices {
+    static const int output_dir_ind = 2;
+    static const int base_size_ind = 3;
+    static const int mutated_size_ind = 4;
+    static const int final_size_ind = 5;
+    static const int vgenes_ind = 6;
+    static const int dgenes_ind = 7;
+    static const int jgenes_ind = 8;
+    static const int num_params = 9;
+};
+
 HC_InputParams ParseHCInputParams(int argc, char* argv[]) {
     HC_InputParams input_params;
-    input_params.basic_repertoire_params.base_repertoire_size = StringToType<int>(string(argv[2]));
-    input_params.basic_repertoire_params.mutated_repertoire_size = StringToType<int>(string(argv[3]));
-    input_params.basic_repertoire_params.final_repertoire_size = StringToType<int>(string(argv[4]));
-    input_params.vgenes_fname =  string(argv[5]);
-    input_params.dgenes_fname =  string(argv[6]);
-    input_params.jgenes_fname =  string(argv[7]);
+    input_params.output_dir = string(argv[HCParamsIndices::output_dir_ind]) + "/";
+    input_params.basic_repertoire_params.base_repertoire_size = StringToType<int>(
+            string(argv[HCParamsIndices::base_size_ind]));
+    input_params.basic_repertoire_params.mutated_repertoire_size = StringToType<int>(
+            string(argv[HCParamsIndices::mutated_size_ind]));
+    input_params.basic_repertoire_params.final_repertoire_size = StringToType<int>(
+            string(argv[HCParamsIndices::final_size_ind]));
+    input_params.vgenes_fname =  string(argv[HCParamsIndices::vgenes_ind]);
+    input_params.dgenes_fname =  string(argv[HCParamsIndices::dgenes_ind]);
+    input_params.jgenes_fname =  string(argv[HCParamsIndices::jgenes_ind]);
+
+    input_params.output_params = OutputParams::CreateStandardParams();
+    input_params.output_params.AddPrefix(input_params.output_dir);
+
     input_params.pattern_shm_params = PatternSHMParams::CreateStandardParams();
     input_params.cdr_shm_params = CDR_SHMParams::CreateStandardParams();
     return input_params;
 }
 
+struct LCParamsIndices {
+    static const int output_dir_ind = 2;
+    static const int base_size_ind = 3;
+    static const int mutated_size_ind = 4;
+    static const int final_size_ind = 5;
+    static const int vgenes_ind = 6;
+    static const int jgenes_ind = 7;
+    static const int num_params = 8;
+};
+
 LC_InputParams ParseLCInputParams(int argc, char* argv[]) {
     LC_InputParams input_params;
-    input_params.basic_repertoire_params.base_repertoire_size = StringToType<int>(string(argv[2]));
-    input_params.basic_repertoire_params.mutated_repertoire_size = StringToType<int>(string(argv[3]));
-    input_params.basic_repertoire_params.final_repertoire_size = StringToType<int>(string(argv[4]));
-    input_params.vgenes_fname =  string(argv[5]);
-    input_params.jgenes_fname =  string(argv[6]);
+    input_params.output_dir = string(argv[LCParamsIndices::output_dir_ind]) + "/";
+    input_params.basic_repertoire_params.base_repertoire_size = StringToType<int>(
+            string(argv[LCParamsIndices::base_size_ind]));
+    input_params.basic_repertoire_params.mutated_repertoire_size = StringToType<int>(
+            string(argv[LCParamsIndices::mutated_size_ind]));
+    input_params.basic_repertoire_params.final_repertoire_size = StringToType<int>(
+            string(argv[LCParamsIndices::final_size_ind]));
+    input_params.vgenes_fname =  string(argv[LCParamsIndices::vgenes_ind]);
+    input_params.jgenes_fname =  string(argv[LCParamsIndices::jgenes_ind]);
+
+    input_params.output_params = OutputParams::CreateStandardParams();
+    input_params.output_params.AddPrefix(input_params.output_dir);
+
     input_params.pattern_shm_params = PatternSHMParams::CreateStandardParams();
     input_params.cdr_shm_params = CDR_SHMParams::CreateStandardParams();
     return input_params;
 }
 
 int main(int argc, char *argv[]) {
-    if(argc == 1) {
+    if(argc < 3) {
         cout << "ERROR: Invalid number of input parameters" << endl;
         Usage();
         return 1;
@@ -74,8 +118,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    string output_dir = string(argv[2]);
+    PrepareOutputDir(output_dir);
+    cout << "Repertoire and statistics will be to " << output_dir << endl;
+
     if(chain_type == Heavy_chain) {
-        if(argc != 8) {
+        if(argc != HCParamsIndices::num_params) {
             cout << "ERROR: Invalid number of input parameters" << endl;
             HCUsage();
             return 1;
@@ -84,7 +132,7 @@ int main(int argc, char *argv[]) {
         CreateHCRepertoire(input_params);
     }
     else {
-        if(argc != 7) {
+        if(argc != LCParamsIndices::num_params) {
             cout << "ERROR: Invalid number of input parameters" << endl;
             LCUsage();
             return 1;

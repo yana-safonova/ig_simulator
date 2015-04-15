@@ -108,6 +108,8 @@ public:
     IgVariableRegionPtr IgVariableRegion() const { return variable_region_; }
 
     size_t Multiplicity() const { return multiplicity_; }
+
+    string Sequence() const { return variable_region_->Sequence(); }
 };
 
 typedef IgCluster<HC_VariableRegionPtr> HC_Cluster;
@@ -147,6 +149,37 @@ public:
         for(auto it = begin(); it != end(); it++)
             size += it->Multiplicity();
         return size;
+    }
+
+    void OutputSequences(string output_fname) const {
+        ofstream out(output_fname.c_str());
+        size_t id = 1;
+        for(auto it = begin(); it != end(); it++) {
+            out << ">antibody_" << id << endl;
+            out << it->Sequence() << endl;
+            id++;
+        }
+        out.close();
+    }
+
+    void OutputRepertoire(string output_fname) const {
+        ofstream out(output_fname.c_str());
+        size_t id = 1;
+        for(auto it = begin(); it != end(); it++) {
+            for(size_t i = 0; i < it->Multiplicity(); i++) {
+                out << ">antibody_" << id << "_multiplicity_" << it->Multiplicity() << "_copy_" << i + 1 << endl;
+                out << it->Sequence() << endl;
+            }
+            id++;
+        }
+        out.close();
+    }
+
+    void OutputMultiplicities(string output_fname) const {
+        ofstream out(output_fname.c_str());
+        for(auto it = begin(); it != end(); it++)
+            out << it->Multiplicity() << endl;
+        out.close();
     }
 };
 
