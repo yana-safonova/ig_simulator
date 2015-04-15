@@ -12,7 +12,6 @@ import getopt
 import os
 import logging
 import shutil
-from tornado import options
 
 import ig_tools_init
 import drawing_utils
@@ -45,7 +44,7 @@ class BaseOptions:
 
 class RepertoireSimulatorOptions:
     short_options = ""
-    long_options = "num-bases= num-mutated= repertoire-size= HV= HD= HJ= KV= KJ= LV= LJ= HC-LC= tech= help".split()
+    long_options = "num-bases= num-mutated= repertoire-size= chain-type= vgenes= dgenes= jgenes= tech= help".split()
 
 class PairedReadMerger:
     long_options = "min-overlap= max-mismatch=".split()
@@ -58,6 +57,7 @@ class Options:
     repertoire_size = 0
     num_reads = 0
 
+    chain_type = ""
     vgenes_path = ""
     dgenes_path = ""
     jgenes_path = ""
@@ -97,9 +97,10 @@ def PrintOptions(options, log):
     log.info("Simulated technology:\t\t\t\t" + str(options.technology))
 
 def usage(log):
-    log.info("./ig_repertoire_simulator.py [options] --num-bases N1 --num-mutated N2 --repertoire-size N3 -o <output-dir>")
+    log.info("./ig_repertoire_simulator.py [options] --chain-type TYPE --num-bases N1 --num-mutated N2 --repertoire-size N3 -o <output-dir>")
     log.info("\nBasic options:")
     log.info("  -o\t\t\t<output_dir>\t\t\tdirectory to store all the resulting files (required)")
+    log.info("  --chain-type\t\tHC/LC\t\tchain type: HC - heavy chain or LC - light chain (required)")
     log.info("  --num-bases\t\t<int>\t\t\t\tnumber of base sequences for simulation of reference repertoire (required)")
     log.info("  --num-mutated\t\t<int>\t\t\t\texpected number of mutated sequences for simulation of reference repertoire (required)")
     log.info("  --repertoire-size\t<int>\t\t\t\texpected size of simulated repertoire (required)")
@@ -113,16 +114,6 @@ def usage(log):
     log.info("  \t\t\t\t\t\t\t[default: 'src/ig_tools/human_ig_germline_genes/human_IGHD.fa']")
     log.info("  --HJ\t\t\t<filename>\t\t\tFASTA file with Ig germline HJ genes")
     log.info("  \t\t\t\t\t\t\t[default: 'src/ig_tools/human_ig_germline_genes/human_IGHJ.fa']\n")
-
-    log.info("  --KV\t\t\t<filename>\t\t\tFASTA file with Ig germline KV genes")
-    log.info("  \t\t\t\t\t\t\t[default: 'src/ig_tools/human_ig_germline_genes/human_IGKV.fa']")
-    log.info("  --KJ\t\t\t<filename>\t\t\tFASTA file with Ig germline KJ genes")
-    log.info("  \t\t\t\t\t\t\t[default: 'src/ig_tools/human_ig_germline_genes/human_IGKJ.fa']\n")
-
-    log.info("  --LV\t\t\t<filename>\t\t\tFASTA file with Ig germline LV genes")
-    log.info("  \t\t\t\t\t\t\t[default: 'src/ig_tools/human_ig_germline_genes/human_IGLV.fa']")
-    log.info("  --LJ\t\t\t<filename>\t\t\tFASTA file with Ig germline LJ genes")
-    log.info("  \t\t\t\t\t\t\t[default: 'src/ig_tools/human_ig_germline_genes/human_IGLJ.fa']\n")
 
     #log.info("  --tech\t\t<illumina/454>\t\t\tNGS technology for read simulation")
     #log.info("  --min-overlap\t\t<int>\t\t\t\tminimal allowed size of overlap in paired reads merging [default: '60']")
@@ -257,9 +248,15 @@ def VisualizeRepertoireStats(options, log) :
     mutation_pos_list = PrepareMutationPositions(files_utils.StrListToFloat(mutation_pos_data.data["col1"]), files_utils.StrListToFloat(mutation_pos_data.data["col2"]))
     DrawMutatedStats(options, mutated_freq, mutation_pos_list, log)
 
+def GetSimulatorCommandLine(options, path_to_binary):
+    command_line = path_to_binary + " " + options.chain_type + " " + options.output_dir + " " + str(options.num_bases) + " " + str(options.num_mutated) + " " + str(options.repertoire_size) + " " + options.vgenes_path + " "
+    if options.chain_type == "HC":
+        return command_line + options.dgenes_path + " " + options.jgenes_path
+    return command_line + options.jgenes_path
+
 def RunRepertoireSimulation(options, path_to_binary, self_dir_path, log):
     CheckVDJgenes(options, self_dir_path, log)
-    command_line = path_to_binary + " " + options.vgenes_path + " " + options.dgenes_path + " " + options.jgenes_path + " " + options.output_dir +  " --num-bases=" + str(options.num_bases) + " --num-mutated=" + str(options.num_mutated) + " --repertoire-size=" + str(options.repertoire_size) + " "
+    command_line = GetSimulatorCommandLine(options, path_to_binary)
     log.info("Repertoire simulator command line: " + command_line)
     log.info('\n==== Reference repertoire simulation')
     error_code = os.system(command_line + " 2>&1 | tee -a " + options.log)
@@ -371,7 +368,6 @@ def RunIdealRepertoireConstruction(options, path_to_binary, log):
 # nothing to do :)
 
 # -------------------------- ParseInputParams -----------------------------------
-
 def DetermineErrorType(options, arg):
     if arg in options.error_type_set:
         options.error_type = options.error_type_set[arg]
@@ -383,6 +379,10 @@ def DetermineErrorType(options, arg):
         options.sim_mode = True
 
 def CheckOptionsCorrectness(options, log):
+    if options.chain_type != 'HC' and options.chain_type != 'LC':
+        log.info("ERROR: Incorrect type of chain (--chain-type) should be equal HC or LC")
+        usage.log()
+        sys.exit(1) 
     if options.num_bases == 0:
         log.info("ERROR: Number of base sequences (--num-bases) is a mandatory parameter!")
         usage(log)
@@ -431,11 +431,13 @@ def ParseCommandLine(options, log):
         elif opt == '--repertoire-size':
             options_dict.repertoire_size = int(arg)
             options_dict.num_reads = int(arg) * 2
-        elif opt == '--HV':
+        elif opt == '--chain-type':
+            options_dict.chain_type = arg
+        elif opt == '--vgenes':
             options_dict.vgenes_path = arg
-        elif opt == '--HD':
+        elif opt == '--dgenes':
             options_dict.dgenes_path = arg
-        elif opt == '--HJ':
+        elif opt == '--jgenes':
             options_dict.jgenes_path = arg
         elif opt == '--min-overlap':
             options_dict.min_overlap = int(arg)
@@ -459,7 +461,7 @@ def RunIgSimulator(options_dict, log):
     log.info("\n======== IgSimulator starts")
     # run repertoire simulator
     RunRepertoireSimulation(options_dict, ig_tools_init.PathToBins.run_simulate_repertoire_tool, ig_tools_init.home_directory, log)
-    # run Grinder read simulator
+    # run read simulator
     RunReadSimulator(options_dict, log)
     # splitting paired reads
     #RunSplittingPairedFastq(options_dict, ig_tools_init.PathToBins.run_split_paired_fastq_reads_tool, log)

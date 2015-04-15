@@ -17,28 +17,15 @@ from matplotlib.font_manager import home
 
 home_directory = os.path.abspath(os.path.dirname(os.path.realpath(__file__))) + '/'
 ig_bin_directory = os.path.join(home_directory, "bin/ig_tools/")
-python_src_directory = os.path.join(home_directory, "src/ig_tools/python_utils/")
-repertoire_simulation_src_directory = os.path.join(home_directory, "src/ig_tools/ig_repertoire_simulation/")
-config_directory = os.path.join(home_directory, "configs/ig_tools/")
-spades_py_scripts_directory = os.path.join(home_directory, "src/spades_pipeline/")
-spades_release_bins = os.path.join(home_directory, "build/release/bin/")
-
-path_to_config_template = os.path.join(config_directory, "config.info.template")
-
-make_ig_bins = "make igtools"
-make_bh = "make rh"
-
-prepare_cfg = "./prepare_cfg"
+python_src_directory = os.path.join(home_directory, "src/python_utils/")
+repertoire_simulation_src_directory = os.path.join(home_directory, "src/ig_simulation/")
 
 sys.path.append(python_src_directory)
-sys.path.append(spades_py_scripts_directory)
 
 class PathToBins:
     create_ideal_repertoire_tool = os.path.join(ig_bin_directory, "create_ideal_repertoire")
     paired_read_merger_tool = os.path.join(ig_bin_directory, "paired_read_merger")
-    repertoire_evaluator_tool = os.path.join(ig_bin_directory, "repertoire_evaluator")
-    simulate_repertoire_tool = os.path.join(ig_bin_directory, "simulate_repertoire")
-    split_paired_fastq_reads_tool = os.path.join(ig_bin_directory, "split_paired_fastq_reads")
+    simulate_repertoire_tool = os.path.join(ig_bin_directory, "ig_simulator")
     fastq_to_fasta_tool = os.path.join(ig_bin_directory, "fastq_to_fasta")
     merged_reads_stats_calc_tool = os.path.join(ig_bin_directory, "compute_merged_reads_stats")
     create_clusters_tool = os.path.join(ig_bin_directory, "create_clusters")
