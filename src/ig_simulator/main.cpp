@@ -54,7 +54,9 @@ struct HCParamsIndices {
 
 HC_InputParams ParseHCInputParams(int argc, char* argv[]) {
     HC_InputParams input_params;
-    input_params.output_dir = string(argv[HCParamsIndices::output_dir_ind]) + "/";
+    input_params.output_dir = string(argv[HCParamsIndices::output_dir_ind]);
+    if(input_params.output_dir[input_params.output_dir.size() - 1] != '/')
+        input_params.output_dir += "/";
     input_params.basic_repertoire_params.base_repertoire_size = StringToType<int>(
             string(argv[HCParamsIndices::base_size_ind]));
     input_params.basic_repertoire_params.mutated_repertoire_size = StringToType<int>(
@@ -85,7 +87,9 @@ struct LCParamsIndices {
 
 LC_InputParams ParseLCInputParams(int argc, char* argv[]) {
     LC_InputParams input_params;
-    input_params.output_dir = string(argv[LCParamsIndices::output_dir_ind]) + "/";
+    input_params.output_dir = string(argv[LCParamsIndices::output_dir_ind]);
+    if(input_params.output_dir[input_params.output_dir.size() - 1] != '/')
+        input_params.output_dir += "/";
     input_params.basic_repertoire_params.base_repertoire_size = StringToType<int>(
             string(argv[LCParamsIndices::base_size_ind]));
     input_params.basic_repertoire_params.mutated_repertoire_size = StringToType<int>(
@@ -120,7 +124,7 @@ int main(int argc, char *argv[]) {
 
     string output_dir = string(argv[2]);
     PrepareOutputDir(output_dir);
-    cout << "Repertoire and statistics will be to " << output_dir << endl;
+    cout << "Repertoire and statistics will written be to " << output_dir << endl << endl;
 
     if(chain_type == Heavy_chain) {
         if(argc != HCParamsIndices::num_params) {

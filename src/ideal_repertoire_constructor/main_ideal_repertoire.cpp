@@ -32,12 +32,12 @@ int main(int argc, char *argv[]) {
 	string prefix = "ID=";
     map<size_t, pair<string, size_t> > cluster_seq_size;
 	for(size_t i = 0; i < reads.size(); i++) {
-			vector<string> splits = split(reads[i].name, ',');
-			string clust_num = splits[0];
-			splits = split(clust_num, '_');
-			size_t prefix_pos = splits[3].find(prefix);
-			assert(prefix_pos != string::npos);
-			clust_num = splits[3].substr(prefix_pos + prefix.size(), clust_num.size() - prefix.size() - prefix_pos);
+			vector<string> splits = split(reads[i].name, '_');
+			string clust_num = splits[4];
+//			splits = split(clust_num, '_');
+//			size_t prefix_pos = splits[3].find(prefix);
+//			assert(prefix_pos != string::npos);
+//			clust_num = splits[3].substr(prefix_pos + prefix.size(), clust_num.size() - prefix.size() - prefix_pos);
             size_t cluster_id = string_to_number<size_t>(clust_num);
 			clusters.Add(i, cluster_id);
             

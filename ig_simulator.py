@@ -57,17 +57,17 @@ class Options:
     repertoire_size = 0
     num_reads = 0
 
-    chain_type = ""
+    chain_type = "HC"
     vgenes_path = ""
     dgenes_path = ""
     jgenes_path = ""
 
     repertoire_fasta = ""
 
-    base_stats = ""
-    mutated_stats = ""
-    mutated_pos_stats = ""
-    repertoire_stats = "" 
+    base_multiplicities = ""
+    base_sequences = ""
+    mutated_multiplicities = ""
+    shm_positions = ""
 
     technology = 'Illumina'
     left_reads = ""
@@ -100,20 +100,19 @@ def usage(log):
     log.info("./ig_repertoire_simulator.py [options] --chain-type TYPE --num-bases N1 --num-mutated N2 --repertoire-size N3 -o <output-dir>")
     log.info("\nBasic options:")
     log.info("  -o\t\t\t<output_dir>\t\t\tdirectory to store all the resulting files (required)")
-    log.info("  --chain-type\t\tHC/LC\t\tchain type: HC - heavy chain or LC - light chain (required)")
     log.info("  --num-bases\t\t<int>\t\t\t\tnumber of base sequences for simulation of reference repertoire (required)")
     log.info("  --num-mutated\t\t<int>\t\t\t\texpected number of mutated sequences for simulation of reference repertoire (required)")
     log.info("  --repertoire-size\t<int>\t\t\t\texpected size of simulated repertoire (required)")
-    log.info("  --HC-LC\t\t<int-int>\t\t\tpercentage of heavy and light chain reads in final repertoire [default: '100-0']. Option is in developing")
+    log.info("  --chain-type\t\tHC or LC\t\t\tchain type: HC (heavy chain) or LC (light chain) [default: HC]")
     log.info("  --test\t\t\t\t\t\truns test dataset")
 
     log.info("\nAdvanced options:")
-    log.info("  --HV\t\t\t<filename>\t\t\tFASTA file with Ig germline HV genes")
-    log.info("  \t\t\t\t\t\t\t[default: 'src/ig_tools/human_ig_germline_genes/human_IGHV.fa']")
-    log.info("  --HD\t\t\t<filename>\t\t\tFASTA file with Ig germline HD genes")
-    log.info("  \t\t\t\t\t\t\t[default: 'src/ig_tools/human_ig_germline_genes/human_IGHD.fa']")
-    log.info("  --HJ\t\t\t<filename>\t\t\tFASTA file with Ig germline HJ genes")
-    log.info("  \t\t\t\t\t\t\t[default: 'src/ig_tools/human_ig_germline_genes/human_IGHJ.fa']\n")
+    log.info("  --vgenes\t\t<filename>\t\t\tFASTA file with Ig germline V genes")
+    log.info("  \t\t\t\t\t\t\t[default: './data/human_ig_germline_genes/human_IGHV.fa']")
+    log.info("  --dgenes\t\t<filename>\t\t\tFASTA file with Ig germline D genes")
+    log.info("  \t\t\t\t\t\t\t[default: './data/human_ig_germline_genes/human_IGHD.fa']")
+    log.info("  --jgenes\t\t<filename>\t\t\tFASTA file with Ig germline J genes")
+    log.info("  \t\t\t\t\t\t\t[default: './data/human_ig_germline_genes/human_IGHJ.fa']\n")
 
     #log.info("  --tech\t\t<illumina/454>\t\t\tNGS technology for read simulation")
     #log.info("  --min-overlap\t\t<int>\t\t\t\tminimal allowed size of overlap in paired reads merging [default: '60']")
@@ -129,9 +128,9 @@ def PrepareOutputDir(output_dir_path):
 # -------------------------- IgRepertoireSimulation --------------------------------------------
 
 def CheckVDJgenes(options, self_dir_path, log):
-    inner_vgenes = os.path.join(ig_tools_init.home_directory, "src/ig_tools/human_ig_germline_genes/human_IGHV.fa")
-    inner_dgenes = os.path.join(ig_tools_init.home_directory, "src/ig_tools/human_ig_germline_genes/human_IGHD.fa")
-    inner_jgenes = os.path.join(ig_tools_init.home_directory, "src/ig_tools/human_ig_germline_genes/human_IGHJ.fa")
+    inner_vgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGHV.fa")
+    inner_dgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGHD.fa")
+    inner_jgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGHJ.fa")
     if not os.path.exists(options.vgenes_path):
         if not os.path.exists(os.path.abspath(inner_vgenes)):
             log.info("ERROR: FASTA file with HV genes was not found")
@@ -154,44 +153,44 @@ def CheckVDJgenes(options, self_dir_path, log):
         log.info("FASTA file with J genes was not specified. IMGT database " + options.jgenes_path + " will be used by default")
 
 def CheckForRepertoireSimulationResults(options, log):
-    options.repertoire_fasta = os.path.join(options.output_dir, "repertoire.fasta")
+    options.repertoire_fasta = os.path.join(options.output_dir, "final_repertoire.fasta")
     if os.path.exists(options.repertoire_fasta):
         log.info("* Simulated reperoire was written to "+ options.repertoire_fasta)
     else:
         log.info("ERROR: FASTA file with simulated repetoire was not found")
         sys.exit(1)
 
-    options.base_stats = os.path.join(options.output_dir, "base_repertoire.stats")
-    if os.path.exists(options.base_stats):
-        log.info("* Statistics for base sequences were written to " + options.base_stats)
+    options.base_sequences = os.path.join(options.output_dir, "base_sequences.fasta")
+    if os.path.exists(options.base_sequences):
+        log.info("* Base sequences were written to " + options.base_sequences)
     else:
-        log.info("ERROR: File with statistics for base sequences was not found")
-        sys.exit(1)
-        
-    options.mutated_stats = os.path.join(options.output_dir, "mutated_repertoire.stats")
-    if os.path.exists(options.mutated_stats):
-        log.info("* Statistics for mutated sequences were written to " + options.mutated_stats)
-    else:
-        log.info("ERROR: File with statistics for mutated sequences was not found")
-        sys.exit(1)
-        
-    options.mutated_pos_stats = os.path.join(options.output_dir, "mutation_positions.stats")
-    if os.path.exists(options.mutated_pos_stats):
-        log.info("* Statistics for mutation positions were written to " + options.mutated_pos_stats)
-    else:
-        log.info("ERROR: File with statistics for mutation positions was not found")    
+        log.info("ERROR: base sequences was not found")
         sys.exit(1)
 
-    options.repertoire_stats = os.path.join(options.output_dir, "final_repertoire.stats")
-    if os.path.exists(options.repertoire_stats):
-        log.info("* Statistics for final repertoire were written to " + options.repertoire_stats)
+    options.base_multiplicities = os.path.join(options.output_dir, "base_multiplicities.txt")
+    if os.path.exists(options.base_multiplicities):
+        log.info("* Multiplicities of base sequences were written to " + options.base_multiplicities)
     else:
-        log.info("ERROR: File with statistics for final repertoire was not found")
+        log.info("ERROR: File with multiplicities of base sequences was not found")
         sys.exit(1)
         
+    options.mutated_multiplicities = os.path.join(options.output_dir, "mutated_multiplicities.txt")
+    if os.path.exists(options.mutated_multiplicities):
+        log.info("* Multiplicities of mutated sequences were written to " + options.mutated_multiplicities)
+    else:
+        log.info("ERROR: File with multiplicities of mutated sequences was not found")
+        sys.exit(1)
+
+    options.shm_positions = os.path.join(options.output_dir, "shm_positions.txt")
+    if os.path.exists(options.shm_positions):
+        log.info("* Positions of SHM were written to " + options.shm_positions)
+    else:
+        log.info("ERROR: File with positions of SHM was not found")
+        sys.exit(1)    
+                
 def DrawBaseStats(options, base_lens, base_freqs, log):
     hist_name1 = os.path.join(options.output_dir, "base_seq_lens.png")
-    len_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Sequence length", ylabel = "Sequence number", output_filename = hist_name1)
+    len_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Sequence length", ylabel = "# sequences", output_filename = hist_name1)
     drawing_utils.DrawHistogram(base_lens, len_hist_settings)
     if os.path.exists(hist_name1):
         log.info("* Histogram of distribution of base sequence lengths was written to " + hist_name1)
@@ -199,32 +198,32 @@ def DrawBaseStats(options, base_lens, base_freqs, log):
         log.info("ERROR: Histogram of distribution of base sequence lengths was not found")
         sys.exit(1)
     
-    hist_name2 = os.path.join(options.output_dir, "base_seq_freq.png")
-    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Sequence frequency", ylabel = "Sequence number", output_filename = hist_name2)
+    hist_name2 = os.path.join(options.output_dir, "base_seq_mult.png")
+    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Base sequence multiplicity", ylabel = "# sequences", output_filename = hist_name2)
     drawing_utils.DrawHistogram(base_freqs, freq_hist_settings)
     if os.path.exists(hist_name2):
-        log.info("* Histogram of distribution of base sequence frequencies was written to " + hist_name2)
+        log.info("* Histogram of distribution of base sequence multiplicities was written to " + hist_name2)
     else:
-        log.info("ERROR: Histogram of distribution of base sequence frequencies was not found")
+        log.info("ERROR: Histogram of distribution of base sequence multiplicities was not found")
         sys.exit(1)
 
 def DrawMutatedStats(options, mutated_freqs, mutation_pos, log):
-    hist_name1 = os.path.join(options.output_dir, "mutated_seq_freq.png")
-    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Sequence frequency", ylabel = "Sequence number", output_filename = hist_name1)
+    hist_name1 = os.path.join(options.output_dir, "mutated_seq_mult.png")
+    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Mutated sequence multiplicity", ylabel = "# sequences", output_filename = hist_name1)
     drawing_utils.DrawHistogram(mutated_freqs, freq_hist_settings)
     if os.path.exists(hist_name1):
-        log.info("* Histogram of distribution of mutated sequences frequencies was written to " + hist_name1)
+        log.info("* Histogram of distribution of mutated sequences multiplicities was written to " + hist_name1)
     else:
-        log.info("ERROR: Histogram of distribution of mutated sequences frequencies was not found")
+        log.info("ERROR: Histogram of distribution of mutated sequences multiplicities was not found")
         sys.exit(1)
 
-    hist_name2 = os.path.join(options.output_dir, "mutation_positions.png")
-    pos_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Relative mutation position", ylabel = "Mutation number", output_filename = hist_name2)
-    drawing_utils.DrawHistogram(mutation_pos, pos_hist_settings)
+    hist_name2 = os.path.join(options.output_dir, "shm_positions.png")
+    pos_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Relative SHM position", ylabel = "# SHMs", output_filename = hist_name2)
+    drawing_utils.DrawMutationHistogram(mutation_pos, pos_hist_settings, options.chain_type)
     if os.path.exists(hist_name2):
-        log.info("* Histogram of somatic mutation positions was written to " + hist_name2)
+        log.info("* Histogram of distribution of SHM positions was written to " + hist_name2)
     else:
-        log.info("ERROR: Histogram of somatic mutation positions was not found")
+        log.info("ERROR: Histogram of distribution of SHM positions was not found")
         sys.exit(1)
 
 def PrepareMutationPositions(mutation_position, seq_len):
@@ -233,20 +232,28 @@ def PrepareMutationPositions(mutation_position, seq_len):
         rel_mutation_pos.append(mutation_position[i] / seq_len[i])
     return rel_mutation_pos
 
+def ReadBaseLens(options):
+    base_sequences_fname = options.base_sequences
+    base_lens = []
+    lines = open(base_sequences_fname, "r").readlines()
+    for i in range(0, len(lines) / 2):
+        base_lens.append(len(lines[i * 2 + 1].strip()))
+    return base_lens 
+
 def VisualizeRepertoireStats(options, log) :
     if not options.draw_hist:
         return 
 
     log.info("\n==== Visualization of repertoire statistics")
 
-    base_data = files_utils.ReadData(options.base_stats)
-    DrawBaseStats(options, files_utils.StrListToInt(base_data.data["col2"]), files_utils.StrListToInt(base_data.data["col3"]), log)
+    base_mult = drawing_utils.ReadIntGraphicalData(options.base_multiplicities).all_keys
+    base_lens = ReadBaseLens(options)
+    DrawBaseStats(options, base_lens, base_mult, log)
 
-    mutated_data = files_utils.ReadData(options.repertoire_stats)
-    mutated_freq = files_utils.StrListToInt(mutated_data.data["col2"])
-    mutation_pos_data = files_utils.ReadData(options.mutated_pos_stats)
+    mutated_mult = drawing_utils.ReadIntGraphicalData(options.mutated_multiplicities).all_keys
+    mutation_pos_data = files_utils.ReadData(options.shm_positions)
     mutation_pos_list = PrepareMutationPositions(files_utils.StrListToFloat(mutation_pos_data.data["col1"]), files_utils.StrListToFloat(mutation_pos_data.data["col2"]))
-    DrawMutatedStats(options, mutated_freq, mutation_pos_list, log)
+    DrawMutatedStats(options, mutated_mult, mutation_pos_list, log)
 
 def GetSimulatorCommandLine(options, path_to_binary):
     command_line = path_to_binary + " " + options.chain_type + " " + options.output_dir + " " + str(options.num_bases) + " " + str(options.num_mutated) + " " + str(options.repertoire_size) + " " + options.vgenes_path + " "
@@ -257,8 +264,7 @@ def GetSimulatorCommandLine(options, path_to_binary):
 def RunRepertoireSimulation(options, path_to_binary, self_dir_path, log):
     CheckVDJgenes(options, self_dir_path, log)
     command_line = GetSimulatorCommandLine(options, path_to_binary)
-    log.info("Repertoire simulator command line: " + command_line)
-    log.info('\n==== Reference repertoire simulation')
+    log.info("Repertoire simulator command line: " + command_line + "\n")
     error_code = os.system(command_line + " 2>&1 | tee -a " + options.log)
 
     if error_code != 0:
@@ -446,9 +452,9 @@ def ParseCommandLine(options, log):
         elif opt == "--tech":
             options_dict.technology = arg
         elif opt == '--test':
-            options_dict.num_bases = 10
-            options_dict.num_mutated = 50
-            options_dict.repertoire_size = 1000
+            options_dict.num_bases = 100
+            options_dict.num_mutated = 500
+            options_dict.repertoire_size = 5000
             options_dict.output_dir = 'ig_simulator_test/'
         elif opt == '--skip-drawing':
             options_dict.draw_hist = False

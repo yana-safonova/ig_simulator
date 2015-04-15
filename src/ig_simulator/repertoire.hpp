@@ -181,6 +181,16 @@ public:
             out << it->Multiplicity() << endl;
         out.close();
     }
+
+    void OutputSHMPositions(string output_fname) const {
+        ofstream out(output_fname.c_str());
+        for(auto it = begin(); it != end(); it++) {
+            auto shm_settings = it->IgVariableRegion()->GetSHMSettings();
+            size_t seq_length = it->Sequence().size();
+            for(auto shm = shm_settings.begin(); shm != shm_settings.end(); shm++)
+                out << shm->first << "\t" << seq_length << endl;
+        }
+    }
 };
 
 typedef Repertoire<HC_Cluster, HC_ClusterIterator> HC_Repertoire;

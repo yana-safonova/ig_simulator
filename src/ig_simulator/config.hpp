@@ -76,6 +76,7 @@ struct OutputParams {
     string base_multiplicity_fname;
     string mutated_sequence_fname;
     string mutated_multiplicity_fname;
+    string mutated_positions;
     string final_repertoire_fname;
 
     OutputParams() :
@@ -83,17 +84,20 @@ struct OutputParams {
             base_multiplicity_fname(),
             mutated_sequence_fname(),
             mutated_multiplicity_fname(),
+            mutated_positions(),
             final_repertoire_fname() { }
 
     OutputParams(string base_sequence_fname,
         string base_multiplicity_fname,
         string mutated_sequence_fname,
         string mutated_multiplicity_fname,
+        string mutated_positions,
         string final_repertoire_fname) :
             base_sequence_fname(base_sequence_fname),
             base_multiplicity_fname(base_multiplicity_fname),
             mutated_sequence_fname(mutated_sequence_fname),
             mutated_multiplicity_fname(mutated_multiplicity_fname),
+            mutated_positions(mutated_positions),
             final_repertoire_fname(final_repertoire_fname) { }
 
     static OutputParams CreateStandardParams() {
@@ -101,6 +105,7 @@ struct OutputParams {
                             "base_multiplicities.txt",
                             "mutated_sequences.fasta",
                             "mutated_multiplicities.txt",
+                            "shm_positions.txt",
                             "final_repertoire.fasta");
     }
 
@@ -109,6 +114,7 @@ struct OutputParams {
         base_multiplicity_fname = prefix + base_multiplicity_fname;
         mutated_sequence_fname = prefix + mutated_sequence_fname;
         mutated_multiplicity_fname = prefix + mutated_multiplicity_fname;
+        mutated_positions = prefix + mutated_positions;
         final_repertoire_fname = prefix + final_repertoire_fname;
     }
 };

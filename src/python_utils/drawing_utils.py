@@ -299,13 +299,21 @@ def DrawSomaticMutations(X, Y, cdrs, settings):
     
     DrawMultiplePlot(X, Y, settings)
 
-def DrawMutationHistogram(pos, settings):
-    cdr1_start = 0.29
-    cdr1_end = 0.34
-    cdr2_start = 0.47
-    cdr2_end = 0.63
-    cdr3_start = 0.95
-    cdr3_end = 1.0
+def DrawMutationHistogram(pos, settings, chain_type = "HC"):
+    cdr1_start = 0.25
+    cdr1_end = 0.3
+    cdr2_start = 0.41
+    cdr2_end = 0.54
+    cdr3_start = 0.79
+    cdr3_end = .86
+
+    if chain_type == 'LC':
+        cdr1_start = 0.23
+        cdr1_end = 0.29
+        cdr2_start = 0.41
+        cdr2_end = 0.49
+        cdr3_start = 0.77
+        cdr3_end = .86
 
     n, bins, patches = DrawHistogram(pos, settings)
     from pylab import *

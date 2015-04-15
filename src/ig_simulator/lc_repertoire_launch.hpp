@@ -120,8 +120,12 @@ void CreateLCRepertoire(LC_InputParams params) {
         " sequences with total multiplicities " << mutated_repertoire->NumberAntibodies() << endl;
     mutated_repertoire->OutputSequences(params.output_params.mutated_sequence_fname);
     mutated_repertoire->OutputMultiplicities(params.output_params.mutated_multiplicity_fname);
-    cout << "Mutated antibody sequences were written to " + params.output_params.mutated_sequence_fname << endl;
-    cout << "Mutated antibody multiplicities were written to " + params.output_params.mutated_multiplicity_fname << endl;
+    mutated_repertoire->OutputSHMPositions(params.output_params.mutated_positions);
+    cout << "Mutated antibody sequences were written to " <<
+            params.output_params.mutated_sequence_fname << endl;
+    cout << "Mutated antibody multiplicities were written to " <<
+            params.output_params.mutated_multiplicity_fname << endl;
+    cout << "Positions of SHM were written to " << params.output_params.mutated_positions << endl;
     cout << endl;
 
     mutated_repertoire->OutputRepertoire(params.output_params.final_repertoire_fname);

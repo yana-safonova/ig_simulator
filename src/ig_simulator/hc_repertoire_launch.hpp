@@ -118,8 +118,8 @@ void CreateHCRepertoire(HC_InputParams params) {
             base_repertoire->NumberAntibodies() << endl;
     base_repertoire->OutputSequences(params.output_params.base_sequence_fname);
     base_repertoire->OutputMultiplicities(params.output_params.base_multiplicity_fname);
-    cout << "Base antibody sequences were written to " + params.output_params.base_sequence_fname << endl;
-    cout << "Base antibody multiplicities were written to " + params.output_params.base_multiplicity_fname << endl;
+    cout << "Base antibody sequences were written to " << params.output_params.base_sequence_fname << endl;
+    cout << "Base antibody multiplicities were written to " << params.output_params.base_multiplicity_fname << endl;
     cout << endl;
 
     cout << "==== Generation of mutated repertoire" << endl;
@@ -128,8 +128,11 @@ void CreateHCRepertoire(HC_InputParams params) {
             " sequences with total multiplicities " << mutated_repertoire->NumberAntibodies() << endl;
     mutated_repertoire->OutputSequences(params.output_params.mutated_sequence_fname);
     mutated_repertoire->OutputMultiplicities(params.output_params.mutated_multiplicity_fname);
-    cout << "Mutated antibody sequences were written to " + params.output_params.mutated_sequence_fname << endl;
-    cout << "Mutated antibody multiplicities were written to " + params.output_params.mutated_multiplicity_fname << endl;
+    mutated_repertoire->OutputSHMPositions(params.output_params.mutated_positions);
+    cout << "Mutated antibody sequences were written to " << params.output_params.mutated_sequence_fname << endl;
+    cout << "Mutated antibody multiplicities were written to " <<
+            params.output_params.mutated_multiplicity_fname << endl;
+    cout << "Positions of SHM were written to " << params.output_params.mutated_positions << endl;
     cout << endl;
 
     mutated_repertoire->OutputRepertoire(params.output_params.final_repertoire_fname);
