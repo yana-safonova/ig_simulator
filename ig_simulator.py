@@ -193,7 +193,7 @@ def CheckForRepertoireSimulationResults(options, log):
         log.info("ERROR: File with positions of SHM was not found")
         sys.exit(1)    
                 
-def DrawBaseStats(options, base_lens, base_freqs, log):
+def DrawBaseStats(options, base_lens, base_freqs, log, min_mult):
     hist_name1 = os.path.join(options.output_dir, "base_seq_lens.png")
     len_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Sequence length", ylabel = "# sequences", output_filename = hist_name1)
     drawing_utils.DrawHistogram(base_lens, len_hist_settings)
@@ -204,7 +204,7 @@ def DrawBaseStats(options, base_lens, base_freqs, log):
         sys.exit(1)
     
     hist_name2 = os.path.join(options.output_dir, "base_seq_freqs.png")
-    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Base sequence frequency (>25)", ylabel = "# sequences", output_filename = hist_name2)
+    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Base sequence frequency (>" + str(min_mult) + ")", ylabel = "# sequences", output_filename = hist_name2)
     drawing_utils.DrawHistogram(base_freqs, freq_hist_settings)
     if os.path.exists(hist_name2):
         log.info("* Histogram of distribution of base sequence frequencies was written to " + hist_name2)
@@ -212,9 +212,9 @@ def DrawBaseStats(options, base_lens, base_freqs, log):
         log.info("ERROR: Histogram of distribution of base sequence frequencies was not found")
         sys.exit(1)
 
-def DrawMutatedStats(options, mutated_freqs, mutation_pos, log):
+def DrawMutatedStats(options, mutated_freqs, mutation_pos, log, min_mult):
     hist_name1 = os.path.join(options.output_dir, "mutated_seq_freqs.png")
-    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Mutated sequence frequency (>5)", ylabel = "# sequences", output_filename = hist_name1)
+    freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Mutated sequence frequency (>" + str(min_mult) + ")", ylabel = "# sequences", output_filename = hist_name1)
     drawing_utils.DrawHistogram(mutated_freqs, freq_hist_settings)
     if os.path.exists(hist_name1):
         log.info("* Histogram of distribution of mutated sequence frequencies was written to " + hist_name1)
@@ -252,15 +252,23 @@ def VisualizeRepertoireStats(options, log) :
     log.info("\n==== Visualization of repertoire statistics")
 
     base_mult_all = drawing_utils.ReadIntGraphicalData(options.base_multiplicities).all_keys
-    base_mult = [m for m in base_mult_all if m > 25]
+    min_mult = 5
+    base_mult = [m for m in base_mult_all if m > min_mult]
+    if len(base_mult) == 0:
+        min_mult = 1
+        base_mult = [m for m in base_mult_all if m > min_mult]
     base_lens = ReadBaseLens(options)
-    DrawBaseStats(options, base_lens, base_mult, log)
+    DrawBaseStats(options, base_lens, base_mult, log, min_mult)
 
     mutated_mult_all = drawing_utils.ReadIntGraphicalData(options.mutated_multiplicities).all_keys
-    mutated_mult = [m for m in mutated_mult_all if m > 5]
+    min_mult = 5
+    mutated_mult = [m for m in mutated_mult_all if m > min_mult]
+    if len(mutated_mult) == 0:
+        min_mult = 1
+        mutated_mult = [m for m in mutated_mult_all if m > min_mult]
     mutation_pos_data = files_utils.ReadData(options.shm_positions)
     mutation_pos_list = PrepareMutationPositions(files_utils.StrListToFloat(mutation_pos_data.data["col1"]), files_utils.StrListToFloat(mutation_pos_data.data["col2"]))
-    DrawMutatedStats(options, mutated_mult, mutation_pos_list, log)
+    DrawMutatedStats(options, mutated_mult, mutation_pos_list, log, min_mult)
 
 def GetSimulatorCommandLine(options, path_to_binary):
     command_line = path_to_binary + " " + options.chain_type + " " + options.output_dir + " " + str(options.num_bases) + " " + str(options.num_mutated) + " " + str(options.repertoire_size) + " " + options.vgenes_path + " "
