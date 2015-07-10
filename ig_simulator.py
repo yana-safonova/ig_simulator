@@ -69,7 +69,7 @@ class Options:
     mutated_multiplicities = ""
     shm_positions = ""
 
-    technology = 'Illumina'
+    technology = 'illumina'
     left_reads = ""
     right_reads = ""
 
@@ -295,7 +295,7 @@ def RunReadSimulator(options, log):
     log.info('\n==== Read Simulator (ART) starts')
 
     command_line = ""
-    if options.technology == "Illumina":
+    if options.technology == "illumina":
         command_line = ig_tools_init.PathToBins.run_art_illumina
         command_line = command_line + " -i " + options.repertoire_fasta + " -p -l 250 -f 1 -m 350 -s 50 -o " + os.path.join(options.output_dir, "paired_reads")
     if options.technology == "454":
