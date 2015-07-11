@@ -49,8 +49,15 @@ struct HCParamsIndices {
     static const int vgenes_ind = 6;
     static const int dgenes_ind = 7;
     static const int jgenes_ind = 8;
-    static const int num_params = 9;
+    static const int database_type = 9;
+    static const int num_params = 10;
 };
+
+DatabaseType ParseDatabaseType(string database_type_str) {
+    if(database_type_str == "imgt")
+        return imgt_db;
+    return regular_db;
+}
 
 HC_InputParams ParseHCInputParams(int argc, char* argv[]) {
     HC_InputParams input_params;
@@ -66,6 +73,7 @@ HC_InputParams ParseHCInputParams(int argc, char* argv[]) {
     input_params.vgenes_fname =  string(argv[HCParamsIndices::vgenes_ind]);
     input_params.dgenes_fname =  string(argv[HCParamsIndices::dgenes_ind]);
     input_params.jgenes_fname =  string(argv[HCParamsIndices::jgenes_ind]);
+    input_params.database_type = ParseDatabaseType(string(argv[HCParamsIndices::database_type]));
 
     input_params.output_params = OutputParams::CreateStandardParams();
     input_params.output_params.AddPrefix(input_params.output_dir);
@@ -82,7 +90,8 @@ struct LCParamsIndices {
     static const int final_size_ind = 5;
     static const int vgenes_ind = 6;
     static const int jgenes_ind = 7;
-    static const int num_params = 8;
+    static const int database_type = 8;
+    static const int num_params = 9;
 };
 
 LC_InputParams ParseLCInputParams(int argc, char* argv[]) {
@@ -98,6 +107,7 @@ LC_InputParams ParseLCInputParams(int argc, char* argv[]) {
             string(argv[LCParamsIndices::final_size_ind]));
     input_params.vgenes_fname =  string(argv[LCParamsIndices::vgenes_ind]);
     input_params.jgenes_fname =  string(argv[LCParamsIndices::jgenes_ind]);
+    input_params.database_type = ParseDatabaseType(string(argv[LCParamsIndices::database_type]));
 
     input_params.output_params = OutputParams::CreateStandardParams();
     input_params.output_params.AddPrefix(input_params.output_dir);

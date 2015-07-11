@@ -8,8 +8,15 @@
 #include "multiplicity_creator.hpp"
 #include "mutated_repertoire_creation/shm_creator.hpp"
 
+ShortGeneNameExtractorPtr CreateShortReadNameExtractor(LC_InputParams params) {
+    if(params.database_type == imgt_db)
+        return ShortGeneNameExtractorPtr(new IMGTShortGeneNameExtractor());
+    return ShortGeneNameExtractorPtr(new TrivialShortGeneNameExtractor());
+}
+
 LC_GenesDatabase_Ptr CreateLCDatabase(LC_InputParams params) {
-    LC_GenesDatabase_Ptr lc_database(new LC_GenesDatabase());
+    ShortGeneNameExtractorPtr short_read_extractor_ptr = CreateShortReadNameExtractor(params);
+    LC_GenesDatabase_Ptr lc_database(new LC_GenesDatabase(short_read_extractor_ptr));
     lc_database->AddGenesFromFile(variable_gene, params.vgenes_fname);
     lc_database->AddGenesFromFile(join_gene, params.jgenes_fname);
     return lc_database;
@@ -128,6 +135,9 @@ void CreateLCRepertoire(LC_InputParams params) {
     cout << "Mutated antibody multiplicities were written to " <<
             params.output_params.mutated_multiplicity_fname << endl;
     cout << "Positions of SHM were written to " << params.output_params.mutated_positions << endl;
+    mutated_repertoire->OutputVDJRecombination(params.output_params.vdj_recombination_fname);
+    cout << "VDJ recombination of the final repertoire was written to " <<
+    params.output_params.vdj_recombination_fname << endl;
     cout << endl;
 
     mutated_repertoire->OutputRepertoire(params.output_params.final_repertoire_fname);

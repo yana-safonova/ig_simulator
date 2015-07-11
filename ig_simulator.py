@@ -44,7 +44,7 @@ class BaseOptions:
 
 class RepertoireSimulatorOptions:
     short_options = ""
-    long_options = "num-bases= num-mutated= repertoire-size= chain-type= vgenes= dgenes= jgenes= tech= help".split()
+    long_options = "num-bases= num-mutated= repertoire-size= chain-type= vgenes= dgenes= jgenes= tech= help db-type=".split()
 
 class PairedReadMerger:
     long_options = "min-overlap= max-mismatch=".split()
@@ -61,6 +61,7 @@ class Options:
     vgenes_path = ""
     dgenes_path = ""
     jgenes_path = ""
+    database_type = "imgt"
 
     repertoire_fasta = ""
 
@@ -95,6 +96,7 @@ def PrintOptions(options, log):
     log.info("Min allowed overlap size:\t\t\t" + str(options.min_overlap))
     log.info("Max allowed mismatch rate:\t\t\t" + str(options.max_mismatch))
     log.info("Simulated technology:\t\t\t\t" + str(options.technology))
+    log.info("Database type:\t\t\t\t\t" + str(options.database_type))
 
 def usage(log):
     log.info("./ig_repertoire_simulator.py [options] --chain-type TYPE --num-bases N1 --num-mutated N2 --repertoire-size N3 -o <output-dir>")
@@ -113,6 +115,7 @@ def usage(log):
     log.info("  \t\t\t\t\t\t\t[default: 'data/human_ig_germline_genes/human_IGHD.fa']")
     log.info("  --jgenes\t\t<filename>\t\t\tFASTA file with Ig germline J genes")
     log.info("  \t\t\t\t\t\t\t[default: 'data/human_ig_germline_genes/human_IGHJ.fa' or 'data/human_ig_germline_genes/human_IGKJ.fa']\n")
+    log.info("  --db-type\t\timgt or reg\t\t\ttype of database: imgt (headers are consistent with http://www.imgt.org/IMGTindex/Fasta.html) or reg (regular, applied for all other cases) [default: imgt]")
 
     #log.info("  --tech\t\t<illumina/454>\t\t\tNGS technology for read simulation")
     #log.info("  --min-overlap\t\t<int>\t\t\t\tminimal allowed size of overlap in paired reads merging [default: '60']")
@@ -135,7 +138,6 @@ def CheckVDJgenes(options, self_dir_path, log):
         inner_vgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGKV.fa")
         inner_jgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGKJ.fa")
         
-
     if not os.path.exists(options.vgenes_path):
         if not os.path.exists(os.path.abspath(inner_vgenes)):
             log.info("ERROR: FASTA file with HV genes was not found")
@@ -191,7 +193,14 @@ def CheckForRepertoireSimulationResults(options, log):
         log.info("* Positions of SHM were written to " + options.shm_positions)
     else:
         log.info("ERROR: File with positions of SHM was not found")
-        sys.exit(1)    
+        sys.exit(1)  
+
+    options.repertoire_vdj = os.path.join(options.output_dir, "repertoire_vdj_recombination.txt")
+    if os.path.exists(options.repertoire_vdj):
+        log.info("* V(D)J recombination for sequences of the final reperoire was written to " + options.repertoire_vdj)
+    else:
+        log.info("ERROR: File with V(D)J recombination for sequences of the final reperoire was not found")
+        sys.exit(1)
                 
 def DrawBaseStats(options, base_lens, base_freqs, log, min_mult):
     hist_name1 = os.path.join(options.output_dir, "base_seq_lens.png")
@@ -273,8 +282,9 @@ def VisualizeRepertoireStats(options, log) :
 def GetSimulatorCommandLine(options, path_to_binary):
     command_line = path_to_binary + " " + options.chain_type + " " + options.output_dir + " " + str(options.num_bases) + " " + str(options.num_mutated) + " " + str(options.repertoire_size) + " " + options.vgenes_path + " "
     if options.chain_type == "HC":
-        return command_line + options.dgenes_path + " " + options.jgenes_path
-    return command_line + options.jgenes_path
+        command_line += options.dgenes_path + " "
+    command_line += options.jgenes_path + " " + options.database_type
+    return command_line
 
 def RunRepertoireSimulation(options, path_to_binary, self_dir_path, log):
     CheckVDJgenes(options, self_dir_path, log)
@@ -363,6 +373,29 @@ def RunPairedReadMerger(options, path_to_binary, log):
         sys.exit(1)
 
 # -------------------------- IdealRepertoireConstruction -----------------------------------
+def CreateReadVDJRecombination(options, log):
+    read_antibody = dict()
+    antibody_vdj = dict()
+    rcm_fhandler = open(options.ideal_repertoire_rcm, "r")
+    for l in rcm_fhandler.readlines():
+        splits = l.strip().split()
+        splits1 = splits[0].split("_")
+        antibody_name = splits1[3] + "_" + splits1[4]
+        read_antibody[splits[0]] = antibody_name
+    rcm_fhandler.close()
+    vdj_fhandler = open(options.repertoire_vdj, "r")
+    for l in vdj_fhandler.readlines():
+        splits = l.strip().split()
+        antibody_vdj[splits[0]] = splits[1]
+    vdj_fhandler.close()
+    options.reads_vdj = os.path.join(options.output_dir, "reads_vdj_recombination.txt")
+    read_vdj_fhandler = open(options.reads_vdj, "w")
+    for read in read_antibody:
+        antibody = read_antibody[read]
+        vdj = antibody_vdj[antibody]
+        read_vdj_fhandler.write(read + "\t" + vdj + "\n")
+    read_vdj_fhandler.close()
+    log.info("* V(D)J recombination for the merged reads was written to " + options.reads_vdj)
 
 def RunIdealRepertoireConstruction(options, path_to_binary, log):
     log.info("\n==== Ideal repertoire construction")
@@ -382,6 +415,7 @@ def RunIdealRepertoireConstruction(options, path_to_binary, log):
     else:
         log.info("ERROR: CLUSTERS.FASTA and RCM for simulated repertoire were not found")
         sys.exit(1)
+    CreateReadVDJRecombination(options, log)
 
 #--------------------------- Cleanup --------------------------------------------
 
@@ -434,6 +468,12 @@ def CheckOptionsCorrectness(options, log):
         sys.exit(1)
     if options.technology != "illumina" and options.technology != "454":
         log.info("ERROR: Option value " + options.technology + " was not recognized. Technology for NGS read simulation should be \"illumina\" or \"454\"")
+        usage(log)
+        sys.exit(1)
+    if options.database_type != 'imgt' and options.database_type != 'reg':
+        log.info("ERROR: Option --db-type value " + options.database_type + " was not recognized. Database type should be \"imgt\" or \"reg\"")
+        usage(log)
+        sys.exit(1) 
 
 def PrintMainOutputFiles(options, log):
     log.info("\nMain output files:")
@@ -477,6 +517,8 @@ def ParseCommandLine(options, log):
             options_dict.output_dir = 'ig_simulator_test/'
         elif opt == '--skip-drawing':
             options_dict.draw_hist = False
+        elif opt == '--db-type':
+            options.database_type = arg
         elif opt == '--help':
             usage(log)
             sys.exit(0)

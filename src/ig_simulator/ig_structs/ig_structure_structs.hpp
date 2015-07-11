@@ -59,6 +59,10 @@ public:
         return db_ptr_->GetByIndex(variable_gene, vgene_index_).GeneName();
     }
 
+    string VshortGeneName() const {
+        return db_ptr_->GetByIndex(variable_gene, vgene_index_).ShortGeneName();
+    }
+
     string VgeneSeq() const {
         return db_ptr_->GetByIndex(variable_gene, vgene_index_).GeneSeq();
     }
@@ -70,6 +74,10 @@ public:
     // D gene block
     string DgeneName() const {
         return db_ptr_->GetByIndex(diversity_gene, dgene_index_).GeneName();
+    }
+
+    string DshortGeneName() const {
+        return db_ptr_->GetByIndex(diversity_gene, dgene_index_).ShortGeneName();
     }
 
     string DgeneSeq() const {
@@ -87,6 +95,10 @@ public:
 
     string JgeneSeq() const {
         return db_ptr_->GetByIndex(join_gene, jgene_index_).GeneSeq();
+    }
+
+    string JshortGeneName() const {
+        return db_ptr_->GetByIndex(join_gene, jgene_index_).ShortGeneName();
     }
 
     size_t JgeneLen() const {
@@ -132,6 +144,10 @@ public:
         vdj->AddNInsertionSettings(NInsertionSettings());
         vdj->AddPInsertionSettings(PInsertionSettings());
         return vdj;
+    }
+
+    string VJDRecombinationString() const {
+        return VshortGeneName() + ";" + DshortGeneName() + ";" + JshortGeneName();
     }
 };
 
@@ -197,6 +213,10 @@ public:
         return db_ptr_->GetByIndex(variable_gene, vgene_index_).GeneName();
     }
 
+    string VshortGeneName() const {
+        return db_ptr_->GetByIndex(variable_gene, vgene_index_).ShortGeneName();
+    }
+
     size_t VgeneLen() const {
         return VgeneSeq().size() - removing_settings_.VEndLen();
     }
@@ -210,6 +230,10 @@ public:
 
     string JgeneName() const {
         return db_ptr_->GetByIndex(join_gene, jgene_index_).GeneName();
+    }
+
+    string JshortGeneName() const {
+        return db_ptr_->GetByIndex(join_gene, jgene_index_).ShortGeneName();
     }
 
     size_t JgeneLen() const {
@@ -258,6 +282,10 @@ public:
         vdj->AddNInsertionSettings(NInsertionSettings());
         vdj->AddPInsertionSettings(PInsertionSettings());
         return vdj;
+    }
+
+    string VJDRecombinationString() const {
+        return VshortGeneName() + ";" + JshortGeneName();
     }
 };
 

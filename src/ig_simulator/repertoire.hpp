@@ -175,6 +175,17 @@ public:
         out.close();
     }
 
+    void OutputVDJRecombination(string output_fname) const {
+        ofstream out(output_fname.c_str());
+        size_t id = 1;
+        for(auto it = begin(); it != end(); it++) {
+            out << "antibody_" << id << "\t" <<
+                    it->IgVariableRegion()->VDJ_Recombination()->VJDRecombinationString() << endl;
+            id++;
+        }
+        out.close();
+    }
+
     void OutputMultiplicities(string output_fname) const {
         ofstream out(output_fname.c_str());
         for(auto it = begin(); it != end(); it++)

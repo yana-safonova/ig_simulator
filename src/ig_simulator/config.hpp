@@ -78,6 +78,7 @@ struct OutputParams {
     string mutated_multiplicity_fname;
     string mutated_positions;
     string final_repertoire_fname;
+    string vdj_recombination_fname;
 
     OutputParams() :
             base_sequence_fname(),
@@ -85,20 +86,23 @@ struct OutputParams {
             mutated_sequence_fname(),
             mutated_multiplicity_fname(),
             mutated_positions(),
-            final_repertoire_fname() { }
+            final_repertoire_fname(),
+            vdj_recombination_fname() { }
 
     OutputParams(string base_sequence_fname,
         string base_multiplicity_fname,
         string mutated_sequence_fname,
         string mutated_multiplicity_fname,
         string mutated_positions,
-        string final_repertoire_fname) :
+        string final_repertoire_fname,
+        string vdj_recombination_fname) :
             base_sequence_fname(base_sequence_fname),
             base_multiplicity_fname(base_multiplicity_fname),
             mutated_sequence_fname(mutated_sequence_fname),
             mutated_multiplicity_fname(mutated_multiplicity_fname),
             mutated_positions(mutated_positions),
-            final_repertoire_fname(final_repertoire_fname) { }
+            final_repertoire_fname(final_repertoire_fname),
+            vdj_recombination_fname(vdj_recombination_fname) { }
 
     static OutputParams CreateStandardParams() {
         return OutputParams("base_sequences.fasta",
@@ -106,7 +110,8 @@ struct OutputParams {
                             "mutated_sequences.fasta",
                             "mutated_frequencies.txt",
                             "shm_positions.txt",
-                            "final_repertoire.fasta");
+                            "final_repertoire.fasta",
+                            "repertoire_vdj_recombination.txt");
     }
 
     void AddPrefix(string prefix) {
@@ -116,13 +121,17 @@ struct OutputParams {
         mutated_multiplicity_fname = prefix + mutated_multiplicity_fname;
         mutated_positions = prefix + mutated_positions;
         final_repertoire_fname = prefix + final_repertoire_fname;
+        vdj_recombination_fname = prefix + vdj_recombination_fname;
     }
 };
+
+enum DatabaseType {regular_db, imgt_db};
 
 struct HC_InputParams {
     string vgenes_fname;
     string dgenes_fname;
     string jgenes_fname;
+    DatabaseType database_type;
 
     string output_dir;
 
@@ -135,6 +144,7 @@ struct HC_InputParams {
             vgenes_fname(""),
             dgenes_fname(""),
             jgenes_fname(""),
+            database_type(regular_db),
             basic_repertoire_params(),
             pattern_shm_params() { }
 
@@ -148,6 +158,7 @@ struct HC_InputParams {
 struct LC_InputParams {
     string vgenes_fname;
     string jgenes_fname;
+    DatabaseType database_type;
 
     string output_dir;
 
@@ -159,6 +170,7 @@ struct LC_InputParams {
     LC_InputParams() :
             vgenes_fname(""),
             jgenes_fname(""),
+            database_type(regular_db),
             basic_repertoire_params(),
             pattern_shm_params() { }
 

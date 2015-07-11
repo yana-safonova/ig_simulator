@@ -2,6 +2,8 @@
 
 #include "include_me.hpp"
 #include "../utils/fasta_reader.hpp"
+#include "../utils/string_tools.hpp"
+
 
 enum IgGeneType {variable_gene, diversity_gene, join_gene};
 
@@ -18,6 +20,7 @@ string IgGeneTypeToString(IgGeneType gene_type) {
 class IgGene {
     //IgGeneType gene_type_;
     string gene_name_;
+    string short_gene_name_;
     string gene_seq_;
 
 public:
@@ -25,34 +28,70 @@ public:
 
     IgGene(string gene_name, string gene_seq) :
             gene_name_(gene_name),
+            short_gene_name_(""),
+            gene_seq_(gene_seq) { }
+
+    IgGene(string gene_name, string short_gene_name, string gene_seq) :
+            gene_name_(gene_name),
+            short_gene_name_(short_gene_name),
             gene_seq_(gene_seq) { }
 
     string GeneName() const { return gene_name_; }
+
+    string ShortGeneName() const { return short_gene_name_; }
 
     string GeneSeq() const { return gene_seq_; }
 };
 
 ostream& operator<< (ostream &out, const IgGene &obj) {
-    out << "Name: " << obj.GeneName() << ". Seq: " << obj.GeneSeq();
+    out << "Full name: " << obj.GeneName() << endl;
+    out << "Short name: " << obj.ShortGeneName() << ". Seq: " << obj.GeneSeq();
     return out;
 }
 
 // ----------------------------------------------------------------------------
+class ShortGeneNameExtractor {
+public:
+    virtual string ExtractShortName(string long_name) const = 0;
+};
 
+class TrivialShortGeneNameExtractor : public ShortGeneNameExtractor {
+public:
+    TrivialShortGeneNameExtractor() { }
+
+    string ExtractShortName(string long_name) const {
+        return long_name;
+    }
+};
+
+class IMGTShortGeneNameExtractor : public ShortGeneNameExtractor {
+public:
+    IMGTShortGeneNameExtractor() { }
+
+    string ExtractShortName(string long_name) const {
+        auto splits = split(long_name, '|');
+        return splits[1];
+    }
+};
+
+typedef shared_ptr<ShortGeneNameExtractor> ShortGeneNameExtractorPtr;
+
+// ----------------------------------------------------------------------------
 class IgGeneDatabase {
     IgGeneType gene_type_;
+    ShortGeneNameExtractorPtr gene_name_extractor_ptr_;
     vector<IgGene> ig_genes_;
 
 public:
-    IgGeneDatabase(IgGeneType gene_type) :
-            gene_type_(gene_type) { }
+    IgGeneDatabase(IgGeneType gene_type, ShortGeneNameExtractorPtr gene_name_extractor_ptr) :
+            gene_type_(gene_type),
+            gene_name_extractor_ptr_(gene_name_extractor_ptr) { }
 
     void AddGenesFromFile(string filename) {
         SingleFastaReader fasta_reader(filename);
-            auto reads = fasta_reader.Read();
-
-            for(auto read = reads.begin(); read != reads.end(); read++)
-                ig_genes_.push_back(IgGene(read->name, read->seq));
+        auto reads = fasta_reader.Read();
+        for(auto read = reads.begin(); read != reads.end(); read++)
+            ig_genes_.push_back(IgGene(read->name, gene_name_extractor_ptr_->ExtractShortName(read->name), read->seq));
     }
 
     void Print(ostream &out) const {
@@ -71,17 +110,16 @@ public:
 };
 
 // ----------------------------------------------------------------------------
-
 class HC_GenesDatabase {
     IgGeneDatabase variable_genes_;
     IgGeneDatabase diversity_genes_;
     IgGeneDatabase join_genes_;
 
 public:
-    HC_GenesDatabase():
-        variable_genes_(variable_gene),
-        diversity_genes_(diversity_gene),
-        join_genes_(join_gene) { }
+    HC_GenesDatabase(ShortGeneNameExtractorPtr short_gene_name_extractor_ptr):
+        variable_genes_(variable_gene, short_gene_name_extractor_ptr),
+        diversity_genes_(diversity_gene, short_gene_name_extractor_ptr),
+        join_genes_(join_gene, short_gene_name_extractor_ptr) { }
 
     void AddGenesFromFile(IgGeneType gene_type, string filename){
         if(gene_type == variable_gene)
@@ -121,15 +159,14 @@ public:
 typedef shared_ptr<HC_GenesDatabase> HC_GenesDatabase_Ptr;
 
 // ----------------------------------------------------------------------------
-
 class LC_GenesDatabase {
     IgGeneDatabase variable_genes_;
     IgGeneDatabase join_genes_;
 
 public:
-    LC_GenesDatabase():
-            variable_genes_(variable_gene),
-            join_genes_(join_gene) { }
+    LC_GenesDatabase(ShortGeneNameExtractorPtr short_gene_name_extractor_ptr):
+            variable_genes_(variable_gene, short_gene_name_extractor_ptr),
+            join_genes_(join_gene, short_gene_name_extractor_ptr) { }
 
     void AddGenesFromFile(IgGeneType gene_type, string filename){
         if(gene_type == variable_gene)
@@ -156,6 +193,5 @@ public:
         join_genes_.Print(out);
     }
 };
-
 
 typedef shared_ptr<LC_GenesDatabase> LC_GenesDatabase_Ptr;
