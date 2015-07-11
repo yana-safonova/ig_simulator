@@ -386,7 +386,10 @@ def CreateReadVDJRecombination(options, log):
     vdj_fhandler = open(options.repertoire_vdj, "r")
     for l in vdj_fhandler.readlines():
         splits = l.strip().split()
-        antibody_vdj[splits[0]] = splits[1]
+        vdj = splits[1]
+        for i in range(2, len(splits)):
+            vdj += " " + splits[i]
+        antibody_vdj[splits[0]] = vdj
     vdj_fhandler.close()
     options.reads_vdj = os.path.join(options.output_dir, "reads_vdj_recombination.txt")
     read_vdj_fhandler = open(options.reads_vdj, "w")
@@ -518,7 +521,7 @@ def ParseCommandLine(options, log):
         elif opt == '--skip-drawing':
             options_dict.draw_hist = False
         elif opt == '--db-type':
-            options.database_type = arg
+            options_dict.database_type = arg
         elif opt == '--help':
             usage(log)
             sys.exit(0)
