@@ -147,6 +147,18 @@ FASTA file with Ig germline D genes. Default value is <code>&lt;igtools_installa
 <code>--jgenes &lt;filename></code></br>
 FASTA file with Ig germline J genes. Default value is <code>&lt;igtools_installation_directory>/data/human_ig_germline_genes/human_IGHJ.fa</code> for heavy chain repertoire and <code>&lt;igtools_installation_directory>/data/human_ig_germline_genes/human_IGKJ.fa</code> for light chain repertoire.</br></br>
 
+<code>--db-type imgt or reg</code><br>
+Type of dababase. By default, this parameter has 'imgt' value and means that headers of FASTA files with V, D, and J genes are consistent with IMGT format, for example:
+<pre class = "code">
+    <code>
+    >M99641|IGHV1-18*01|Homo sapiens|F|V-REGION|188..483|296 nt|1| | | | |296+0=296| | |
+    CAGGTTCAGCTGGTGCAGTCTGGAGCTGAGGTGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGTTACACCTTTACCAGCTATGGTATCAGCTGGGTGCGACAGGCCC
+    CTGGACAAGGGCTTGAGTGGATGGGATGGATCAGCGCTTACAATGGTAACACAAACTATGCACAGAAGCTCCAGGGCAGAGTCACCATGACCACAGACACATCCACGAGCACAGCCTACAT
+    GGAGCTGAGGAGCCTGAGATCTGACGACACGGCCGTGTATTACTGTGCGAGAGA
+    </code>
+</pre> 
+In this case, gene segment name specified after the first '|' symbol (IGHV1-18*01) will be used in output files containing V(D)J recombination (see <a href = "#simulator_output">Output files</a> for more details).<br>
+If your database is not in IMGT format, please specify 'reg' value for this option. In this case, entire sequences specified in headers will be used as gene segment names.   
 <!- ---------------------- ->
 
 <a id = "simulator_advanced"></a>
@@ -190,6 +202,15 @@ If you want to additionally specify paths to V/D/J germline genes instead of usi
         <li><b>paired_reads1.fq</b> - FASTQ file with left reads constructed using ART read simulator. Reads correspond to simulated Illumina MiSeq library.</li>  
         <li><b>paired_reads2.fq</b> - FASTQ file with right reads constructed using ART read simulator. Reads correspond to simulated Illumina MiSeq library.</li>  
         <li><b>merged_reads.fastq</b> - FASTQ file consructed as result of merging left and right files with reads. This file is expected to be input for <code>IgRepertoireConstruction</code> tool.</li>  
+        <li><b>reads_vdj_recombination.txt</b> contains information about V(D)J recombination for each read from <b>merged_reads.fastq</b> file. Example of <b>reads_vdj_recombination.txt</b> file is given below:</li>
+        <pre class = "code">
+            <code>
+    34_merged_read_antibody_20_multiplicity_1_copy_1-1/1    IGHV3-48*02;IGHD3-16*02;IGHJ6*02
+    53_merged_read_antibody_34_multiplicity_1_copy_1-1/1    IGHV4-28*02;IGHD3-10*01;IGHJ6*03
+    59_merged_read_antibody_37_multiplicity_2_copy_2-1/1    IGHV4-28*02;IGHD3-10*01;IGHJ6*03
+    8_merged_read_antibody_9_multiplicity_4_copy_1-1/1      IGHV3-66*01;IGHD3-22*01;IGHJ6*03
+            </code>
+        </pre>
     </ul></br>
 
     <li>Files with statistics of the simulated repertoire:</li>
@@ -200,6 +221,15 @@ If you want to additionally specify paths to V/D/J germline genes instead of usi
         <li><b>mutated_frequencies.txt</b> contains frequencies of mutated sequences.</li>
         <li><b>shm_positions.txt</b> contains information about all introduced somatic hypermutations. 
         Each line corresponds to one mutation and of this file includes two field (separated by 'tab'): 'mutation position' and 'sequence length'.</li>
+        <li><b>repertoire_vdj_recombination.txt</b> contains information about V(D)J recombination for each constructed antibody. Example of <b>repertoire_vdj_recombination.txt</b> file is given below:</li>
+        <pre class = "code">
+            <code>
+    antibody_1     IGHV3-13*01;IGHD3-3*02;IGHJ4*02
+    antibody_2     IGHV4-30-4*02;IGHD4-17*01;IGHJ4*03
+    antibody_3     IGHV4-30-4*02;IGHD4-17*01;IGHJ4*03
+    antibody_4     IGHV3-13*02;IGHD3-10*01;IGHJ5*01
+            </code>
+        </pre>
     </ul></br>
     
     <li>Visialization of the statistics for the simulated repertoire</li>
@@ -224,6 +254,7 @@ If you want to additionally specify paths to V/D/J germline genes instead of usi
     <li>Files described ideal repertoire (see details in section <a href = "#repertoire_files">4</a>):</li>
     <ul>
         <li><b>ideal_repertoire.clusters.fasta</b> - CLUSTERS.FASTA file corresponding ideal clusters for <b>merged_reads.fastq</b>.</li>
+
         <li><b>ideal_repertoire.rcm</b> - RCM file corresponding ideal clusters for <b>merged_reads.fastq</b>. This file can be used as ideal read-cluster map in <code>IgQUAST</code> tool.</li>
     </ul></br>
 
