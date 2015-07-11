@@ -70,6 +70,7 @@ public:
 
     string ExtractShortName(string long_name) const {
         auto splits = split(long_name, '|');
+        assert(splits.size() > 1);
         return splits[1];
     }
 };

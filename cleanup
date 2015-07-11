@@ -1,2 +1,3 @@
 rm ig_simulator.py~
 rm -rf ig_simulator_test
+rm *~
