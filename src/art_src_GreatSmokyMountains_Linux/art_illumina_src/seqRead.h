@@ -31,7 +31,7 @@
 #include <map>
 #include <cstdio>
 #include <set>
-#include <gsl/gsl_cdf.h>
+#include <boost/math/distributions/binomial.hpp>
 
 #include "empdist.h"
 
@@ -47,8 +47,9 @@ public:
     vector<double> sub_rate; //Binomial
     void set_rate(int read_len, double p, int max_num, vector <double>& rate){
         rate.resize(max_num);
+        boost::math::binomial_distribution<double> bd(read_len, p);
         for(size_t i=1; i<=max_num; i++){
-            rate[i-1]= gsl_cdf_binomial_Q(i, p, read_len);
+            rate[i-1] = boost::math::cdf(boost::math::complement(bd, i));
         }
     };
     static char rand_base(){
