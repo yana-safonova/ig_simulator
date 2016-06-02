@@ -20,13 +20,7 @@
  * <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 */
 #pragma once
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_sys.h>
-#include <gsl/gsl_machine.h>
-#include <gsl/gsl_precision.h>
-#include <gsl/gsl_nan.h>
-#include <gsl/gsl_pow_int.h>
+#include <random>
 
 #include <cmath>
 #include <string>
@@ -100,7 +94,7 @@ public:
       }
     }
     
-    static gsl_rng* gsl_R;
+    static std::mt19937 rng;
     static int gaussain_mean;
     static double gaussain_sigma;
 
@@ -110,40 +104,25 @@ public:
     }; 
 
     static void ini_read_pair_rand(int mean, double sigma, unsigned int gseed){
-        gsl_rng_default_seed=gseed;
-        const gsl_rng_type *rndT=gsl_rng_default;
-        gsl_R=gsl_rng_alloc(rndT);
+        rng.seed(gseed);
         gaussain_mean=mean;
         gaussain_sigma=sigma;
     }; 
 
 
-  
-    static gsl_rng* gsl_g;
-    static gsl_rng* gsl_p;
-    static void ini_bias_model(){
-        gsl_rng_default_seed=(unsigned int)time(NULL);
-        const gsl_rng_type *rndT=gsl_rng_default;
-        gsl_g=gsl_rng_alloc(rndT);
-        const gsl_rng_type *rndT2=gsl_rng_default;
-        gsl_p=gsl_rng_alloc(rndT2);
-    }; 
- 
     double ave_depth;
     double para_x1; 
 
     int get_depth_cov(){ 
-      double depth_rate=ave_depth+para_x1*ave_depth*gsl_ran_gaussian(gsl_g,1);
-      if(depth_rate<0){ depth_rate=0; return 0; }
-      return gsl_ran_poisson (gsl_p, depth_rate);
+      static std::normal_distribution<double> norm(0., 1.);
+      double depth_rate=ave_depth+para_x1*ave_depth * norm(rng);
+      if (depth_rate<0) {
+        // depth_rate=0;
+        return 0;
+      }
+      std::poisson_distribution<int> pois(depth_rate);
+      return pois(rng);
     };
-
-    static void free_gsl(){
-      gsl_rng_free(gsl_R);
-      gsl_rng_free(gsl_g);
-      gsl_rng_free(gsl_p);
-    };
-    
 
     bool next_read_indel_bias(seqRead& a_read){
       long pos=a_read.bpos;//(long) floor(r_prob()*valid_region); //pos in [0 ..len-1]   
@@ -171,9 +150,10 @@ public:
 
 
     bool next_pair_read_indel_bias(seqRead& read_1, seqRead& read_2){
-      int fragment_len=gaussain_mean+ (int)floor(gsl_ran_gaussian(gsl_R, gaussain_sigma));
+      std::normal_distribution<double> norm(0., gaussain_sigma);
+      int fragment_len=gaussain_mean+ (int)floor(norm(rng));
       while (fragment_len<read_len || fragment_len>ref_seq.length()){
-        fragment_len=gaussain_mean+ (int)floor(gsl_ran_gaussian(gsl_R, gaussain_sigma));
+        fragment_len=gaussain_mean+ (int)floor(norm(rng));
       } 
       long pos_1=read_1.bpos; //(long) floor((ref_seq.length()-fragment_len)*r_prob());
       long pos_2=pos_1+fragment_len-read_len;

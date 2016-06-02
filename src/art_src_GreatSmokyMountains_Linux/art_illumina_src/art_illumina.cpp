@@ -37,7 +37,7 @@
 
 using namespace std;
 double empdist::prob_err[HIGHEST_QUAL];
-gsl_rng* art::gsl_R;
+std::mt19937 art::rng;
 int art::gaussain_mean;
 double art::gaussain_sigma;
 
