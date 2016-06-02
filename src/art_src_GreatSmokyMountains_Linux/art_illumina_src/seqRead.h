@@ -62,21 +62,6 @@ public:
 	    cal_err_rate_2nd.assign(error_2nd,error_2nd+len);
     }
 
-    vector <double> cal_qual_1st;
-    vector <double> cal_qual_2nd;
-    vector<gsl_rng*> gsl_p_1st;
-    vector<gsl_rng*> gsl_p_2nd;
-    void ini_ran_qual(){
-      gsl_rng_default_seed=(unsigned int)time(NULL);
-      const gsl_rng_type *rndT=gsl_rng_default;
-      for(size_t k=0; k<cal_err_rate_1st.size(); k++){
-        cal_qual_1st.push_back(-10*log10(cal_err_rate_1st[k]));
-        cal_qual_2nd.push_back(-10*log10(cal_err_rate_2nd[k]));
-        gsl_p_1st.push_back(gsl_rng_alloc(rndT));
-        gsl_p_2nd.push_back(gsl_rng_alloc(rndT));
-      }
-    };
-
     static const int max_N_qual=10;
     vector <double> cal_err_rate_1st;
     vector <double> cal_err_rate_2nd;
