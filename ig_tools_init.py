@@ -27,15 +27,13 @@ class PathToBins:
     paired_read_merger_tool = os.path.join(ig_bin_directory, "paired_read_merger")
     simulate_repertoire_tool = os.path.join(ig_bin_directory, "ig_simulator")
 
-    art_illumina = os.path.join(home_directory, "src/art_bin_VanillaIceCream/art_illumina")
-    art_454 = os.path.join(home_directory, "src/art_bin_VanillaIceCream/art_454")
+    art_illumina = os.path.join(home_directory, "bin/art_illumina")
 
     run_create_ideal_repertoire_tool = ig_bin_directory + "./ideal_repertoire_constructor"
     run_paired_read_merger_tool = ig_bin_directory + "./paired_read_merger"
     run_simulate_repertoire_tool = ig_bin_directory + "./ig_simulator"
 
-    run_art_illumina = os.path.join(home_directory, "src/art_bin_VanillaIceCream/./art_illumina")
-    run_art_454 = os.path.join(home_directory, "src/art_bin_VanillaIceCream/./art_454")
+    run_art_illumina = os.path.join(home_directory, "bin/art_illumina")
 
 def PrintCommandLine(argv, log):
     command_line = " ".join([str(x) for x in argv] )
