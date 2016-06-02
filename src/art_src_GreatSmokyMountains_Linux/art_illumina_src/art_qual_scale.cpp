@@ -76,11 +76,7 @@ bool art::next_read(seqRead& a_read){
 
 //on the same strand of two reads
 bool art::next_pair_read_indel(seqRead& read_1, seqRead& read_2){
-    std::normal_distribution<double> norm(0., gaussain_sigma);
-    int fragment_len=gaussain_mean+ (int)floor(norm(rng));
-    while (fragment_len<read_len || fragment_len>ref_seq.length()){
-        fragment_len=gaussain_mean+ (int)floor(norm(rng));
-    }
+    int fragment_len = get_fragment_len();
     long pos_1=(long) floor((ref_seq.length()-fragment_len)*r_prob());
     long pos_2=pos_1+fragment_len-read_len;
     int slen_1 =read_1.get_indel(read_len);
@@ -126,11 +122,7 @@ bool art::next_pair_read_indel_mate(seqRead& read_1, seqRead& read_2){
 	   fragment_len=ref_seq.length();
     }
     else{
-      std::normal_distribution<double> norm(0., gaussain_sigma);
-	    fragment_len=gaussain_mean+ (int)floor(norm(rng));
-	    while (fragment_len<read_len || fragment_len>ref_seq.length()){
-		    fragment_len=gaussain_mean+ (int)floor(norm(rng));
-	    }
+      fragment_len = get_fragment_len();
     }
 
     long pos_1=(long) floor((ref_seq.length()-fragment_len)*r_prob())+fragment_len-read_len;
@@ -181,11 +173,7 @@ bool art::next_pair_read_indel_cmp(seqRead& read_1, seqRead& read_2){
 	   fragment_len=ref_seq.length();
     }
     else{
-      std::normal_distribution<double> norm(0., gaussain_sigma);
-	    fragment_len=gaussain_mean+ (int)floor(norm(rng));
-	    while (fragment_len<read_len || fragment_len>ref_seq.length()){
-		    fragment_len=gaussain_mean+ (int)floor(norm(rng));
-	    }
+      fragment_len = get_fragment_len();
     }
     long pos_1=(long) floor((ref_seq.length()-fragment_len)*r_prob());
     //long pos_2=pos_1+fragment_len-read_len;

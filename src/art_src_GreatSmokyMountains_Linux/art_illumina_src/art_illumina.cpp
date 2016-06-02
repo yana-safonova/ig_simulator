@@ -306,7 +306,7 @@ int main(int argc, char* argv[]){
 	    if(mean_flag && sDev_flag){
 //		    art::ini_read_pair_rand(abs(mean),fabs(std_dev));
 		    art::ini_read_pair_rand(abs(mean),fabs(std_dev),rand_seed);
-		    if(art::gaussain_mean<=read_len){
+		    if(art::gaussain_mean <= read_len && art::gaussain_mean != 0){
 			    cerr<<"Fatal Error: The read length must be shorter than the mean fragment length specified." <<endl;
 			    exit(1);
 		    }

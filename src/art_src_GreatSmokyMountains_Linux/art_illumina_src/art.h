@@ -110,6 +110,21 @@ public:
     }; 
 
 
+    int get_fragment_len() const {
+      if (gaussain_mean == 0) {
+        return ref_seq.length();
+      }
+
+      int fragment_len;
+        do {
+            std::normal_distribution<double> norm(gaussain_mean, gaussain_sigma);
+            fragment_len = norm(rng);
+        } while (fragment_len<read_len || fragment_len>ref_seq.length());
+
+      return fragment_len;
+    }
+
+
     double ave_depth;
     double para_x1; 
 
@@ -150,11 +165,7 @@ public:
 
 
     bool next_pair_read_indel_bias(seqRead& read_1, seqRead& read_2){
-      std::normal_distribution<double> norm(0., gaussain_sigma);
-      int fragment_len=gaussain_mean+ (int)floor(norm(rng));
-      while (fragment_len<read_len || fragment_len>ref_seq.length()){
-        fragment_len=gaussain_mean+ (int)floor(norm(rng));
-      } 
+      int fragment_len = get_fragment_len();
       long pos_1=read_1.bpos; //(long) floor((ref_seq.length()-fragment_len)*r_prob());
       long pos_2=pos_1+fragment_len-read_len;
       bool is_plus_strand=true;

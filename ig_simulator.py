@@ -301,7 +301,7 @@ def RunReadSimulator(options, log):
     log.info('\n==== Read Simulator (ART) starts')
 
     command_line = ig_tools_init.PathToBins.run_art_illumina
-    command_line = command_line + " -ss " + options.technology + " -i " + options.repertoire_fasta + " -p -l 250 -f 1 -m 350 -s 50 -o " + os.path.join(options.output_dir, "paired_reads")
+    command_line = command_line + " -ss " + options.technology + " -i " + options.repertoire_fasta + " -p -l 250 -f 1 -m 0 -s 1 -o " + os.path.join(options.output_dir, "paired_reads")
     log.info("ART's command line: " + command_line)
     error_code = os.system(command_line + " 2>&1 | tee -a " + options.log)
 
