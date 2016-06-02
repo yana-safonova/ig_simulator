@@ -80,8 +80,8 @@ class Options:
 
     merged_reads = ""
     ideal_repertoire_fa = ""
-    ideal_repertoire_rcm = ""   
-    
+    ideal_repertoire_rcm = ""
+
     draw_hist = True
 
     log = ""
@@ -137,7 +137,7 @@ def CheckVDJgenes(options, self_dir_path, log):
     if options.chain_type == "LC":
         inner_vgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGKV.fa")
         inner_jgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGKJ.fa")
-        
+
     if not os.path.exists(options.vgenes_path):
         if not os.path.exists(os.path.abspath(inner_vgenes)):
             log.info("ERROR: FASTA file with HV genes was not found")
@@ -180,7 +180,7 @@ def CheckForRepertoireSimulationResults(options, log):
     else:
         log.info("ERROR: File with frequencies of base sequences was not found")
         sys.exit(1)
-        
+
     options.mutated_multiplicities = os.path.join(options.output_dir, "mutated_frequencies.txt")
     if os.path.exists(options.mutated_multiplicities):
         log.info("* Frequencies of mutated sequences were written to " + options.mutated_multiplicities)
@@ -193,7 +193,7 @@ def CheckForRepertoireSimulationResults(options, log):
         log.info("* Positions of SHM were written to " + options.shm_positions)
     else:
         log.info("ERROR: File with positions of SHM was not found")
-        sys.exit(1)  
+        sys.exit(1)
 
     options.repertoire_vdj = os.path.join(options.output_dir, "repertoire_vdj_recombination.txt")
     if os.path.exists(options.repertoire_vdj):
@@ -201,7 +201,7 @@ def CheckForRepertoireSimulationResults(options, log):
     else:
         log.info("ERROR: File with V(D)J recombination for sequences of the final reperoire was not found")
         sys.exit(1)
-                
+
 def DrawBaseStats(options, base_lens, base_freqs, log, min_mult):
     hist_name1 = os.path.join(options.output_dir, "base_seq_lens.png")
     len_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Sequence length", ylabel = "# sequences", output_filename = hist_name1)
@@ -211,7 +211,7 @@ def DrawBaseStats(options, base_lens, base_freqs, log, min_mult):
     else:
         log.info("ERROR: Histogram of distribution of base sequence lengths was not found")
         sys.exit(1)
-    
+
     hist_name2 = os.path.join(options.output_dir, "base_seq_freqs.png")
     freq_hist_settings = drawing_utils.GetGraphicalSettings(xlabel = "Base sequence frequency (>" + str(min_mult) + ")", ylabel = "# sequences", output_filename = hist_name2)
     drawing_utils.DrawHistogram(base_freqs, freq_hist_settings)
@@ -252,11 +252,11 @@ def ReadBaseLens(options):
     lines = open(base_sequences_fname, "r").readlines()
     for i in range(0, len(lines) / 2):
         base_lens.append(len(lines[i * 2 + 1].strip()))
-    return base_lens 
+    return base_lens
 
 def VisualizeRepertoireStats(options, log) :
     if not options.draw_hist:
-        return 
+        return
 
     log.info("\n==== Visualization of repertoire statistics")
 
@@ -312,7 +312,7 @@ def RunReadSimulator(options, log):
         command_line = ig_tools_init.PathToBins.run_art_454
         command_line = command_line + " " + options.repertoire_fasta + " " + os.path.join(options.output_dir, "paired_reads") + " 1 350 50"
     log.info("ART's command line: " + command_line)
-    error_code = os.system(command_line + " 2>&1 | tee -a " + options.log) 
+    error_code = os.system(command_line + " 2>&1 | tee -a " + options.log)
 
     if error_code != 0:
         AbnormalFinishMsg(log, "ART")
@@ -408,7 +408,7 @@ def RunIdealRepertoireConstruction(options, path_to_binary, log):
     if error_code != 0:
         AbnormalFinishMsg(log, "ideal_repertoire_constructor")
         sys.exit(1)
-    
+
     options.ideal_repertoire_fa = os.path.join(options.output_dir, "ideal_repertoire.clusters.fa")
     options.ideal_repertoire_rcm = os.path.join(options.output_dir, "ideal_repertoire.rcm")
     if os.path.exists(options.ideal_repertoire_fa) and os.path.exists(options.ideal_repertoire_rcm):
@@ -444,7 +444,7 @@ def CheckOptionsCorrectness(options, log):
     if options.chain_type != 'HC' and options.chain_type != 'LC':
         log.info("ERROR: Incorrect type of chain (--chain-type) should be equal HC or LC")
         usage(log)
-        sys.exit(1) 
+        sys.exit(1)
     if options.num_bases == 0:
         log.info("ERROR: Number of base sequences (--num-bases) is a mandatory parameter!")
         usage(log)
@@ -476,11 +476,11 @@ def CheckOptionsCorrectness(options, log):
     if options.database_type != 'imgt' and options.database_type != 'reg':
         log.info("ERROR: Option --db-type value " + options.database_type + " was not recognized. Database type should be \"imgt\" or \"reg\"")
         usage(log)
-        sys.exit(1) 
+        sys.exit(1)
 
 def PrintMainOutputFiles(options, log):
     log.info("\nMain output files:")
-    log.info("* Sequences of simulated repertoire were written to " + options.repertoire_fasta) 
+    log.info("* Sequences of simulated repertoire were written to " + options.repertoire_fasta)
     log.info("* Simulated merged reads were written to " + options.merged_reads)
     log.info("* CLUSTERS.FA for simulated repertoire were written to " + options.ideal_repertoire_fa)
     log.info("* RCM for simulated repertoire were written to " + options.ideal_repertoire_rcm)
@@ -599,7 +599,7 @@ def main():
         RunIgSimulator(options_dict, log)
         log.info("\nThank you for using IgSimulator!")
     except (KeyboardInterrupt):
-        log.info("\nIgSimulator was interrupted!")  
+        log.info("\nIgSimulator was interrupted!")
     except BaseException:
         exc_type, exc_value, _ = sys.exc_info()
         if exc_type == SystemExit:
