@@ -34,10 +34,6 @@ def CheckBinaries(log):
         log.info("ERROR: ART Illumina read simulator was not found")
         sys.exit(1)
 
-    if not os.path.exists(ig_tools_init.PathToBins.art_454):
-        log.info("ERROR: ART 454 read simulator was not found")
-        sys.exit(1)
-
 class BaseOptions:
     long_options = "test skip-drawing".split()
     short_options = "o:"
@@ -70,7 +66,7 @@ class Options:
     mutated_multiplicities = ""
     shm_positions = ""
 
-    technology = 'illumina'
+    technology = 'MSv1'
     left_reads = ""
     right_reads = ""
 
@@ -95,7 +91,7 @@ def PrintOptions(options, log):
     log.info("Expected number of reads:\t\t\t" + str(options.num_reads))
     log.info("Min allowed overlap size:\t\t\t" + str(options.min_overlap))
     log.info("Max allowed mismatch rate:\t\t\t" + str(options.max_mismatch))
-    log.info("Simulated technology:\t\t\t\t" + str(options.technology))
+    log.info("Simulated technology:\t\t\t\t" + "Illumina " + str(options.technology))
     log.info("Database type:\t\t\t\t\t" + str(options.database_type))
 
 def usage(log):
@@ -304,13 +300,8 @@ def RunRepertoireSimulation(options, path_to_binary, self_dir_path, log):
 def RunReadSimulator(options, log):
     log.info('\n==== Read Simulator (ART) starts')
 
-    command_line = ""
-    if options.technology == "illumina":
-        command_line = ig_tools_init.PathToBins.run_art_illumina
-        command_line = command_line + " -i " + options.repertoire_fasta + " -p -l 250 -f 1 -m 350 -s 50 -o " + os.path.join(options.output_dir, "paired_reads")
-    if options.technology == "454":
-        command_line = ig_tools_init.PathToBins.run_art_454
-        command_line = command_line + " " + options.repertoire_fasta + " " + os.path.join(options.output_dir, "paired_reads") + " 1 350 50"
+    command_line = ig_tools_init.PathToBins.run_art_illumina
+    command_line = command_line + " -ss " + options.technology + " -i " + options.repertoire_fasta + " -p -l 250 -f 1 -m 350 -s 50 -o " + os.path.join(options.output_dir, "paired_reads")
     log.info("ART's command line: " + command_line)
     error_code = os.system(command_line + " 2>&1 | tee -a " + options.log)
 
@@ -469,8 +460,9 @@ def CheckOptionsCorrectness(options, log):
         log.info("ERROR: Maximal allowed mismatch rate (--max-mismatch) should be from [0, 1]")
         usage(log)
         sys.exit(1)
-    if options.technology != "illumina" and options.technology != "454":
-        log.info("ERROR: Option value " + options.technology + " was not recognized. Technology for NGS read simulation should be \"illumina\" or \"454\"")
+    technologies = ["GA1", "GA2", "HS10", "HS20", "HS25", "HS10", "HS20", "HS25", "HSXn", "HSXt", "MinS", "MSv1", "MSv3", "NS50"]
+    if options.technology not in technologies:
+        log.info("ERROR: Option value " + options.technology + " was not recognized. Technology for NGS read simulation should be one of " + ", ".join(technologies))
         usage(log)
         sys.exit(1)
     if options.database_type != 'imgt' and options.database_type != 'reg':
