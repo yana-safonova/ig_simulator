@@ -105,11 +105,8 @@ public:
     static double gaussain_sigma;
 
     static void ini_read_pair_rand(int mean, double sigma){
-        gsl_rng_default_seed=(unsigned int)time(NULL);
-        const gsl_rng_type *rndT=gsl_rng_default;
-        gsl_R=gsl_rng_alloc(rndT);
-        gaussain_mean=mean;
-        gaussain_sigma=sigma;
+        unsigned int gseed = (unsigned int)time(NULL);
+        ini_read_pair_rand(mean, sigma, gseed);
     }; 
 
     static void ini_read_pair_rand(int mean, double sigma, unsigned int gseed){
