@@ -31,13 +31,6 @@
 #include <map>
 #include <cstdio>
 #include <set>
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
-//#include <gsl/gsl_sys.h>
-//#include <gsl/gsl_machine.h>
-//#include <gsl/gsl_precision.h>
-//#include <gsl/gsl_nan.h>
-//#include <gsl/gsl_pow_int.h>
 #include <gsl/gsl_cdf.h>
 
 #include "empdist.h"
