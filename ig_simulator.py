@@ -61,7 +61,7 @@ class Options:
     vgenes_path = ""
     dgenes_path = ""
     jgenes_path = ""
-    database_type = "imgt"
+    database_type = "reg"
 
     repertoire_fasta = ""
 
@@ -110,12 +110,12 @@ def usage(log):
 
     log.info("\nAdvanced options:")
     log.info("  --vgenes\t\t<filename>\t\t\tFASTA file with Ig germline V genes")
-    log.info("  \t\t\t\t\t\t\t[default: 'data/human_ig_germline_genes/human_IGHV.fa' or 'data/human_ig_germline_genes/human_IGKV.fa']")
+    log.info("  \t\t\t\t\t\t\t[default: 'data/germline/human/IG/IGHV.fa' or 'data/germline/human/IG/IGKV.fa']")
     log.info("  --dgenes\t\t<filename>\t\t\tFASTA file with Ig germline D genes")
-    log.info("  \t\t\t\t\t\t\t[default: 'data/human_ig_germline_genes/human_IGHD.fa']")
+    log.info("  \t\t\t\t\t\t\t[default: 'data/germline/human/IG/IGHD.fa']")
     log.info("  --jgenes\t\t<filename>\t\t\tFASTA file with Ig germline J genes")
-    log.info("  \t\t\t\t\t\t\t[default: 'data/human_ig_germline_genes/human_IGHJ.fa' or 'data/human_ig_germline_genes/human_IGKJ.fa']\n")
-    log.info("  --db-type\t\timgt or reg\t\t\ttype of database: imgt (headers are consistent with http://www.imgt.org/IMGTindex/Fasta.html) or reg (regular, applied for all other cases) [default: imgt]")
+    log.info("  \t\t\t\t\t\t\t[default: 'data/germline/human/IG/IGHJ.fa' or 'data/germline/human/IG/IGKJ.fa']\n")
+    log.info("  --db-type\t\timgt or reg\t\t\ttype of database: imgt (headers are consistent with http://www.imgt.org/IMGTindex/Fasta.html) or reg (regular, applied for all other cases) [default: reg]")
 
     #log.info("  --tech\t\t<illumina/454>\t\t\tNGS technology for read simulation")
     #log.info("  --min-overlap\t\t<int>\t\t\t\tminimal allowed size of overlap in paired reads merging [default: '60']")
@@ -131,12 +131,12 @@ def PrepareOutputDir(output_dir_path):
 # -------------------------- IgRepertoireSimulation --------------------------------------------
 
 def CheckVDJgenes(options, self_dir_path, log):
-    inner_vgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGHV.fa")
-    inner_dgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGHD.fa")
-    inner_jgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGHJ.fa")
+    inner_vgenes = os.path.join(ig_tools_init.home_directory, "data/germline/human/IG/IGHV.fa")
+    inner_dgenes = os.path.join(ig_tools_init.home_directory, "data/germline/human/IG/IGHD.fa")
+    inner_jgenes = os.path.join(ig_tools_init.home_directory, "data/germline/human/IG/IGHJ.fa")
     if options.chain_type == "LC":
-        inner_vgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGKV.fa")
-        inner_jgenes = os.path.join(ig_tools_init.home_directory, "data/human_ig_germline_genes/human_IGKJ.fa")
+        inner_vgenes = os.path.join(ig_tools_init.home_directory, "data/germline/human/IG/IGKV.fa")
+        inner_jgenes = os.path.join(ig_tools_init.home_directory, "data/germline/human/IG/IGKJ.fa")
         
     if not os.path.exists(options.vgenes_path):
         if not os.path.exists(os.path.abspath(inner_vgenes)):
